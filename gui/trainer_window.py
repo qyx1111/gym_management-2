@@ -33,6 +33,21 @@ class TrainerWindow(tk.Toplevel):
         self.add_button = ttk.Button(form_frame, text="添加教练", command=self.add_trainer)
         self.add_button.grid(row=2, column=0, columnspan=4, padx=5, pady=10)
 
+        # 搜索框架
+        search_frame = ttk.LabelFrame(self, text="搜索教练")
+        search_frame.pack(padx=10, pady=(0,5), fill="x")
+
+        ttk.Label(search_frame, text="搜索 (姓名/专长):").pack(side=tk.LEFT, padx=(5,0))
+        self.search_trainer_entry = ttk.Entry(search_frame, width=30)
+        self.search_trainer_entry.pack(side=tk.LEFT, padx=5, fill="x", expand=True)
+        self.search_trainer_entry.bind("<Return>", self.search_trainer)
+
+        self.search_trainer_button = ttk.Button(search_frame, text="搜索", command=self.search_trainer)
+        self.search_trainer_button.pack(side=tk.LEFT, padx=5)
+
+        self.show_all_trainers_button = ttk.Button(search_frame, text="显示全部", command=self.load_trainers)
+        self.show_all_trainers_button.pack(side=tk.LEFT, padx=5)
+
         list_frame = ttk.LabelFrame(self, text="教练列表")
         list_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
@@ -97,12 +112,27 @@ class TrainerWindow(tk.Toplevel):
         else:
             messagebox.showerror("失败", message, parent=self)
 
-    def load_trainers(self):
+    def load_trainers(self, search_term=None):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        trainers = db_ops.get_all_trainers()
+        
+        if search_term:
+            trainers = db_ops.search_trainers(search_term)
+            if not trainers:
+                messagebox.showinfo("搜索结果", f"未找到与 '{search_term}'相关的教练。", parent=self)
+        else:
+            self.search_trainer_entry.delete(0, tk.END) # 清空搜索框
+            trainers = db_ops.get_all_trainers()
+            
         for trainer in trainers:
             self.tree.insert("", tk.END, values=trainer)
+
+    def search_trainer(self, event=None):
+        search_term = self.search_trainer_entry.get().strip()
+        if not search_term:
+            messagebox.showwarning("提示", "请输入搜索关键词。", parent=self)
+            return
+        self.load_trainers(search_term=search_term)
 
     def get_selected_trainer_id(self):
         selected_item = self.tree.focus()

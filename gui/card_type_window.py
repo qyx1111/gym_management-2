@@ -37,6 +37,21 @@ class CardTypeWindow(tk.Toplevel):
         self.add_button = ttk.Button(form_frame, text="添加类型", command=self.add_card_type)
         self.add_button.grid(row=2, column=0, columnspan=4, padx=5, pady=10)
 
+        # 搜索框架
+        search_frame = ttk.LabelFrame(self, text="搜索会员卡类型")
+        search_frame.pack(padx=10, pady=(0,5), fill="x")
+
+        ttk.Label(search_frame, text="搜索 (类型名称):").pack(side=tk.LEFT, padx=(5,0))
+        self.search_card_type_entry = ttk.Entry(search_frame, width=30)
+        self.search_card_type_entry.pack(side=tk.LEFT, padx=5, fill="x", expand=True)
+        self.search_card_type_entry.bind("<Return>", self.search_card_type)
+
+        self.search_card_type_button = ttk.Button(search_frame, text="搜索", command=self.search_card_type)
+        self.search_card_type_button.pack(side=tk.LEFT, padx=5)
+
+        self.show_all_card_types_button = ttk.Button(search_frame, text="显示全部", command=self.load_card_types)
+        self.show_all_card_types_button.pack(side=tk.LEFT, padx=5)
+
         list_frame = ttk.LabelFrame(self, text="会员卡类型列表")
         list_frame.pack(padx=10, pady=10, fill="both", expand=True)
 
@@ -127,12 +142,27 @@ class CardTypeWindow(tk.Toplevel):
         else:
             messagebox.showerror("失败", message, parent=self)
 
-    def load_card_types(self):
+    def load_card_types(self, search_term=None):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        card_types = db_ops.get_all_card_types()
+        
+        if search_term:
+            card_types = db_ops.search_card_types(search_term)
+            if not card_types:
+                messagebox.showinfo("搜索结果", f"未找到与 '{search_term}'相关的会员卡类型。", parent=self)
+        else:
+            self.search_card_type_entry.delete(0, tk.END) # 清空搜索框
+            card_types = db_ops.get_all_card_types()
+
         for ct in card_types:
             self.tree.insert("", tk.END, values=ct)
+
+    def search_card_type(self, event=None):
+        search_term = self.search_card_type_entry.get().strip()
+        if not search_term:
+            messagebox.showwarning("提示", "请输入搜索关键词。", parent=self)
+            return
+        self.load_card_types(search_term=search_term)
 
     def get_selected_card_type_id(self):
         selected_item = self.tree.focus()

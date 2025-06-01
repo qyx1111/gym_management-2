@@ -40,6 +40,30 @@ def get_all_members():
     finally:
         conn.close()
 
+def search_members(search_term):
+    """根据姓名或电话搜索会员"""
+    conn = create_connection()
+    if not conn:
+        return []
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT id, name, gender, birth_date, phone, emergency_contact_name, 
+                   emergency_contact_phone, health_notes, join_date, status 
+            FROM members 
+            WHERE name LIKE ? OR phone LIKE ?
+            ORDER BY id DESC
+        """
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term, like_term))
+        members = cursor.fetchall()
+        return members
+    except sqlite3.Error as e:
+        print(f"搜索会员时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
 def get_member_by_id(member_id):
     """通过ID获取单个会员信息"""
     conn = create_connection()
@@ -142,6 +166,29 @@ def get_all_card_types():
         return card_types
     except sqlite3.Error as e:
         print(f"查询会员卡类型时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def search_card_types(search_term):
+    """根据名称搜索会员卡类型"""
+    conn = create_connection()
+    if not conn:
+        return []
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT id, name, price, duration_days, description 
+            FROM membership_card_types
+            WHERE name LIKE ?
+            ORDER BY id DESC
+        """
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term,))
+        card_types = cursor.fetchall()
+        return card_types
+    except sqlite3.Error as e:
+        print(f"搜索会员卡类型时发生错误: {e}")
         return []
     finally:
         conn.close()
@@ -249,6 +296,29 @@ def get_all_trainers():
     finally:
         conn.close()
 
+def search_trainers(search_term):
+    """根据姓名或专长搜索教练"""
+    conn = create_connection()
+    if not conn:
+        return []
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT id, name, specialty, contact_info, status 
+            FROM trainers
+            WHERE name LIKE ? OR specialty LIKE ?
+            ORDER BY id DESC
+        """
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term, like_term))
+        trainers = cursor.fetchall()
+        return trainers
+    except sqlite3.Error as e:
+        print(f"搜索教练时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
 def get_trainer_by_id(trainer_id):
     """通过ID获取单个教练信息"""
     conn = create_connection()
@@ -343,6 +413,29 @@ def get_all_courses():
         return courses
     except sqlite3.Error as e:
         print(f"查询课程时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def search_courses(search_term):
+    """根据名称搜索课程"""
+    conn = create_connection()
+    if not conn:
+        return []
+    try:
+        cursor = conn.cursor()
+        query = """
+            SELECT id, name, description, default_duration_minutes, status 
+            FROM courses
+            WHERE name LIKE ?
+            ORDER BY id DESC
+        """
+        like_term = f"%{search_term}%"
+        cursor.execute(query, (like_term,))
+        courses = cursor.fetchall()
+        return courses
+    except sqlite3.Error as e:
+        print(f"搜索课程时发生错误: {e}")
         return []
     finally:
         conn.close()

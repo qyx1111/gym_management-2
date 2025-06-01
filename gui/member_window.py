@@ -62,6 +62,22 @@ class MemberWindow(tk.Toplevel):
         self.register_button = ttk.Button(form_frame, text="注册会员", command=self.register_member)
         self.register_button.grid(row=4, column=0, columnspan=4, padx=5, pady=10)
 
+        # 搜索框架
+        search_frame = ttk.LabelFrame(self, text="搜索会员")
+        search_frame.pack(padx=10, pady=(0,5), fill="x")
+
+        ttk.Label(search_frame, text="搜索 (姓名/电话):").pack(side=tk.LEFT, padx=(5,0))
+        self.search_member_entry = ttk.Entry(search_frame, width=30)
+        self.search_member_entry.pack(side=tk.LEFT, padx=5, fill="x", expand=True)
+        self.search_member_entry.bind("<Return>", self.search_member) 
+        
+        self.search_member_button = ttk.Button(search_frame, text="搜索", command=self.search_member)
+        self.search_member_button.pack(side=tk.LEFT, padx=5)
+        
+        self.show_all_members_button = ttk.Button(search_frame, text="显示全部", command=self.load_members)
+        self.show_all_members_button.pack(side=tk.LEFT, padx=5)
+
+
         # 会员列表框架
         list_frame = ttk.LabelFrame(self, text="会员列表")
         list_frame.pack(padx=10, pady=10, fill="both", expand=True)
@@ -144,14 +160,28 @@ class MemberWindow(tk.Toplevel):
         else:
             messagebox.showerror("失败", message, parent=self)
 
-    def load_members(self):
+    def load_members(self, search_term=None):
         # 清空现有数据
         for item in self.tree.get_children():
             self.tree.delete(item)
         
-        members = db_ops.get_all_members()
+        if search_term:
+            members = db_ops.search_members(search_term)
+            if not members:
+                messagebox.showinfo("搜索结果", f"未找到与 '{search_term}'相关的会员。", parent=self)
+        else:
+            self.search_member_entry.delete(0, tk.END) # 清空搜索框
+            members = db_ops.get_all_members()
+            
         for member in members:
             self.tree.insert("", tk.END, values=member)
+
+    def search_member(self, event=None): # event=None使其可以被按钮和回车调用
+        search_term = self.search_member_entry.get().strip()
+        if not search_term:
+            messagebox.showwarning("提示", "请输入搜索关键词。", parent=self)
+            return
+        self.load_members(search_term=search_term)
 
     def get_selected_member_id(self):
         selected_item = self.tree.focus() # 获取选中的项
