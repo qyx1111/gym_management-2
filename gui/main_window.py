@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox # 确保 messagebox 已导入
+from tkinter import ttk, messagebox
 from .member_window import MemberWindow
 from .card_type_window import CardTypeWindow
 from .trainer_window import TrainerWindow
@@ -71,25 +71,34 @@ class MainWindow(tk.Tk):
         self.style.configure("Accent.TButton", font=('Helvetica', 10, 'bold'), padding=5)
 
 
+    def open_module_window(self, WindowClass):
+        """通用函数，用于打开模块窗口并隐藏主窗口"""
+        self.withdraw() # 隐藏主窗口
+        module_win = WindowClass(self) # 将主窗口实例传递给子窗口
+        module_win.grab_set() 
+        # 子窗口关闭时，通过协议或按钮回调重新显示主窗口
+
+    def show_main_window(self):
+        """重新显示主窗口"""
+        self.deiconify()
+        self.update_status("返回主页")
+
+
     def open_member_management(self):
-        member_win = MemberWindow(self)
-        member_win.grab_set() 
+        self.open_module_window(MemberWindow)
         self.update_status("打开会员管理模块")
 
     def open_course_management(self):
-        course_win = CourseWindow(self)
-        course_win.grab_set()
+        self.open_module_window(CourseWindow)
         self.update_status("打开课程管理模块")
 
 
     def open_trainer_management(self):
-        trainer_win = TrainerWindow(self)
-        trainer_win.grab_set()
+        self.open_module_window(TrainerWindow)
         self.update_status("打开教练管理模块")
 
     def open_card_type_management(self):
-        card_type_win = CardTypeWindow(self)
-        card_type_win.grab_set()
+        self.open_module_window(CardTypeWindow)
         self.update_status("打开会员卡类型管理模块")
 
     def update_status(self, message):

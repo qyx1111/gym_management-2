@@ -6,7 +6,7 @@ class CourseWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("课程管理")
-        self.geometry("800x500")
+        self.geometry("800x550") # 稍微增加高度
         self.parent = parent
 
         style = ttk.Style(self)
@@ -68,8 +68,16 @@ class CourseWindow(tk.Toplevel):
         self.delete_button = ttk.Button(action_frame, text="删除选中课程 (逻辑)", command=self.delete_selected_course)
         self.delete_button.pack(side=tk.LEFT, padx=5)
 
+        self.return_button = ttk.Button(action_frame, text="返回主页", command=self.close_and_return_to_main)
+        self.return_button.pack(side=tk.RIGHT, padx=5)
+
         self.load_courses()
         self.tree.bind("<Double-1>", self.on_double_click_edit)
+        self.protocol("WM_DELETE_WINDOW", self.close_and_return_to_main)
+
+    def close_and_return_to_main(self):
+        self.parent.show_main_window()
+        self.destroy()
 
     def on_double_click_edit(self, event):
         self.edit_selected_course()

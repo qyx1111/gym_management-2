@@ -278,16 +278,18 @@ def add_trainer(name, specialty, contact_info):
     finally:
         conn.close()
 
-def get_all_trainers():
-    """获取所有教练信息 (包括非活动的)"""
+def get_all_trainers(active_only=False): # Modified to accept active_only flag
+    """获取所有教练信息"""
     conn = create_connection()
     if not conn:
         return []
     
     try:
         cursor = conn.cursor()
-        # 可以选择只显示 active 的教练，或全部显示并在界面上区分
-        cursor.execute("SELECT id, name, specialty, contact_info, status FROM trainers ORDER BY id DESC")
+        if active_only:
+            cursor.execute("SELECT id, name, specialty, contact_info, status FROM trainers WHERE status = 'active' ORDER BY name")
+        else:
+            cursor.execute("SELECT id, name, specialty, contact_info, status FROM trainers ORDER BY id DESC")
         trainers = cursor.fetchall()
         return trainers
     except sqlite3.Error as e:
@@ -305,12 +307,13 @@ def search_trainers(search_term):
         cursor = conn.cursor()
         query = """
             SELECT id, name, specialty, contact_info, status 
-            FROM trainers
-            WHERE name LIKE ? OR specialty LIKE ?
-            ORDER BY id DESC
+            FROM trainers 
+            WHERE (name LIKE ? OR specialty LIKE ?) AND status = 'active'
+            ORDER BY name
         """
-        like_term = f"%{search_term}%"
-        cursor.execute(query, (like_term, like_term))
+        # 使用 % 通配符进行模糊匹配
+        term = f"%{search_term}%"
+        cursor.execute(query, (term, term))
         trainers = cursor.fetchall()
         return trainers
     except sqlite3.Error as e:
@@ -400,7 +403,7 @@ def add_course(name, description, default_duration_minutes):
     finally:
         conn.close()
 
-def get_all_courses():
+def get_all_courses(active_only=False): # Modified to accept active_only flag
     """获取所有课程信息"""
     conn = create_connection()
     if not conn:
@@ -408,7 +411,10 @@ def get_all_courses():
     
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name, description, default_duration_minutes, status FROM courses ORDER BY id DESC")
+        if active_only:
+            cursor.execute("SELECT id, name, description, default_duration_minutes, status FROM courses WHERE status = 'active' ORDER BY name")
+        else:
+            cursor.execute("SELECT id, name, description, default_duration_minutes, status FROM courses ORDER BY id DESC")
         courses = cursor.fetchall()
         return courses
     except sqlite3.Error as e:
@@ -504,3 +510,310 @@ def delete_course_logically(course_id):
         conn.close()
 
 # --- 其他模块的数据库操作函数将在此处添加 ---
+
+# --- Member Card Instance Operations ---
+
+def assign_card_to_member(member_id, card_type_id, purchase_date, activation_date, expiry_date, status, notes):
+    """为会员办理新卡"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''INSERT INTO member_cards (member_id, card_type_id, purchase_date, activation_date, expiry_date, status, notes)
+             VALUES (?, ?, ?, ?, ?, ?, ?)'''
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_id, card_type_id, purchase_date, activation_date, expiry_date, status, notes))
+        conn.commit()
+        return True, "会员卡办理成功"
+    except sqlite3.Error as e:
+        return False, f"办理会员卡时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def get_cards_for_member(member_id):
+    """获取指定会员的所有会员卡信息"""
+    conn = create_connection()
+    if not conn:
+        return []
+    sql = """
+        SELECT mc.id, mct.name, mc.purchase_date, mc.activation_date, mc.expiry_date, mc.status, mc.notes, mc.card_type_id
+        FROM member_cards mc
+        JOIN membership_card_types mct ON mc.card_type_id = mct.id
+        WHERE mc.member_id = ?
+        ORDER BY mc.purchase_date DESC
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_id,))
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"查询会员卡信息时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def get_member_card_details(member_card_id):
+    """获取特定会员卡实例的详细信息"""
+    conn = create_connection()
+    if not conn:
+        return None
+    sql = "SELECT id, member_id, card_type_id, purchase_date, activation_date, expiry_date, status, notes FROM member_cards WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_card_id,))
+        return cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"获取会员卡详情时出错: {e}")
+        return None
+    finally:
+        conn.close()
+
+
+def update_member_card_details(member_card_id, card_type_id, purchase_date, activation_date, expiry_date, status, notes):
+    """更新会员卡信息"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''UPDATE member_cards 
+             SET card_type_id = ?, purchase_date = ?, activation_date = ?, expiry_date = ?, status = ?, notes = ?
+             WHERE id = ?'''
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (card_type_id, purchase_date, activation_date, expiry_date, status, notes, member_card_id))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到该会员卡或信息无变化"
+        return True, "会员卡信息更新成功"
+    except sqlite3.Error as e:
+        return False, f"更新会员卡信息时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def delete_member_card(member_card_id):
+    """删除会员的某张卡"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = "DELETE FROM member_cards WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_card_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到要删除的会员卡"
+        return True, "会员卡删除成功"
+    except sqlite3.Error as e:
+        return False, f"删除会员卡时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+# --- Member Course Enrollment Operations ---
+
+def enroll_member_in_course(member_id, course_id, enrollment_date, status='enrolled', notes=''):
+    """为会员报名课程"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''INSERT INTO member_course_enrollments (member_id, course_id, enrollment_date, status, notes)
+             VALUES (?, ?, ?, ?, ?)'''
+    try:
+        cursor = conn.cursor()
+        if isinstance(enrollment_date, (datetime, datetime.date)):
+            enrollment_date_str = enrollment_date.strftime('%Y-%m-%d')
+        else:
+            enrollment_date_str = enrollment_date # Assume it's already a string in correct format
+
+        cursor.execute(sql, (member_id, course_id, enrollment_date_str, status, notes))
+        conn.commit()
+        return True, "课程报名成功"
+    except sqlite3.Error as e:
+        return False, f"课程报名时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def get_enrollments_for_member(member_id):
+    """获取指定会员的所有课程报名信息"""
+    conn = create_connection()
+    if not conn:
+        return []
+    sql = """
+        SELECT mce.id, c.name, mce.enrollment_date, mce.status, mce.notes, mce.course_id
+        FROM member_course_enrollments mce
+        JOIN courses c ON mce.course_id = c.id
+        WHERE mce.member_id = ?
+        ORDER BY mce.enrollment_date DESC
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_id,))
+        return cursor.fetchall() # (mce.id, c.name, mce.enrollment_date, mce.status, mce.notes, mce.course_id)
+    except sqlite3.Error as e:
+        print(f"查询会员课程报名信息时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def get_member_enrollment_details(enrollment_id):
+    """获取特定课程报名记录的详细信息"""
+    conn = create_connection()
+    if not conn:
+        return None
+    sql = "SELECT id, member_id, course_id, enrollment_date, status, notes FROM member_course_enrollments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (enrollment_id,))
+        return cursor.fetchone() # (id, member_id, course_id, enrollment_date, status, notes)
+    except sqlite3.Error as e:
+        print(f"获取课程报名详情时出错: {e}")
+        return None
+    finally:
+        conn.close()
+
+def update_enrollment_details(enrollment_id, course_id, enrollment_date, status, notes):
+    """更新课程报名信息"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''UPDATE member_course_enrollments
+             SET course_id = ?, enrollment_date = ?, status = ?, notes = ?
+             WHERE id = ?'''
+    try:
+        cursor = conn.cursor()
+        if isinstance(enrollment_date, (datetime, datetime.date)):
+            enrollment_date_str = enrollment_date.strftime('%Y-%m-%d')
+        else:
+            enrollment_date_str = enrollment_date
+
+        cursor.execute(sql, (course_id, enrollment_date_str, status, notes, enrollment_id))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到该报名记录或信息无变化"
+        return True, "课程报名信息更新成功"
+    except sqlite3.Error as e:
+        return False, f"更新课程报名信息时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def unenroll_member_from_course(enrollment_id):
+    """取消会员的课程报名"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = "DELETE FROM member_course_enrollments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (enrollment_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到要取消的报名记录"
+        return True, "课程报名取消成功"
+    except sqlite3.Error as e:
+        return False, f"取消课程报名时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+# --- Member Trainer Assignment Operations ---
+
+def assign_trainer_to_member(member_id, trainer_id, assignment_date, assignment_type='', notes=''):
+    """为会员指派教练"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''INSERT INTO member_trainer_assignments (member_id, trainer_id, assignment_date, assignment_type, notes)
+             VALUES (?, ?, ?, ?, ?)'''
+    try:
+        cursor = conn.cursor()
+        # Ensure assignment_date is in 'YYYY-MM-DD' format if it's a date object
+        if isinstance(assignment_date, (datetime, datetime.date)):
+            assignment_date_str = assignment_date.strftime('%Y-%m-%d')
+        else:
+            assignment_date_str = assignment_date # Assume it's already a string in correct format
+
+        cursor.execute(sql, (member_id, trainer_id, assignment_date_str, assignment_type, notes))
+        conn.commit()
+        return True, "教练指派成功"
+    except sqlite3.Error as e:
+        return False, f"教练指派时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def get_assignments_for_member(member_id):
+    """获取指定会员的所有教练指派信息"""
+    conn = create_connection()
+    if not conn:
+        return []
+    sql = """
+        SELECT mta.id, t.name, mta.assignment_date, mta.assignment_type, mta.notes, mta.trainer_id
+        FROM member_trainer_assignments mta
+        JOIN trainers t ON mta.trainer_id = t.id
+        WHERE mta.member_id = ?
+        ORDER BY mta.assignment_date DESC
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (member_id,))
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"查询会员教练指派信息时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def get_member_assignment_details(assignment_id):
+    """获取特定教练指派记录的详细信息"""
+    conn = create_connection()
+    if not conn:
+        return None
+    sql = "SELECT id, member_id, trainer_id, assignment_date, assignment_type, notes FROM member_trainer_assignments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (assignment_id,))
+        return cursor.fetchone() # (id, member_id, trainer_id, assignment_date, assignment_type, notes)
+    except sqlite3.Error as e:
+        print(f"获取教练指派详情时出错: {e}")
+        return None
+    finally:
+        conn.close()
+
+def update_assignment_details(assignment_id, trainer_id, assignment_date, assignment_type, notes):
+    """更新教练指派信息"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''UPDATE member_trainer_assignments
+             SET trainer_id = ?, assignment_date = ?, assignment_type = ?, notes = ?
+             WHERE id = ?'''
+    try:
+        cursor = conn.cursor()
+        if isinstance(assignment_date, (datetime, datetime.date)):
+            assignment_date_str = assignment_date.strftime('%Y-%m-%d')
+        else:
+            assignment_date_str = assignment_date
+
+        cursor.execute(sql, (trainer_id, assignment_date_str, assignment_type, notes, assignment_id))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到该指派记录或信息无变化"
+        return True, "教练指派信息更新成功"
+    except sqlite3.Error as e:
+        return False, f"更新教练指派信息时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def unassign_trainer_from_member(assignment_id):
+    """解除会员的教练指派"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = "DELETE FROM member_trainer_assignments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (assignment_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到要解除的指派记录"
+        return True, "教练指派解除成功"
+    except sqlite3.Error as e:
+        return False, f"解除教练指派时发生数据库错误: {e}"
+    finally:
+        conn.close()

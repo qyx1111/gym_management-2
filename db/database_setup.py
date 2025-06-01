@@ -9,6 +9,7 @@ def create_connection():
     conn = None
     try:
         conn = sqlite3.connect(DATABASE_NAME)
+        conn.execute("PRAGMA foreign_keys = ON") # 确保外键约束被激活
         return conn
     except sqlite3.Error as e:
         print(f"数据库连接错误: {e}")
@@ -32,7 +33,6 @@ def create_tables():
                     emergency_contact_phone TEXT,
                     health_notes TEXT,
                     join_date TEXT NOT NULL,
-                    membership_card_id INTEGER, 
                     status TEXT DEFAULT 'active' 
                 );
             """)
@@ -46,17 +46,19 @@ def create_tables():
                     description TEXT
                 );
             """)
-            # 会员卡实例表
+            # 会员卡实例表 (会员拥有的卡) - 这是“会员与会员卡的关系表”
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS member_cards (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     member_id INTEGER NOT NULL,
                     card_type_id INTEGER NOT NULL,
                     purchase_date TEXT NOT NULL,
+                    activation_date TEXT, 
                     expiry_date TEXT NOT NULL,
-                    status TEXT DEFAULT 'active', -- active, frozen, expired
-                    FOREIGN KEY (member_id) REFERENCES members (id),
-                    FOREIGN KEY (card_type_id) REFERENCES membership_card_types (id)
+                    status TEXT DEFAULT 'pending_activation', -- e.g., pending_activation, active, frozen, expired, cancelled
+                    notes TEXT,
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
+                    FOREIGN KEY (card_type_id) REFERENCES membership_card_types (id) ON DELETE RESTRICT
                 );
             """)
             # 课程表
@@ -66,7 +68,7 @@ def create_tables():
                     name TEXT NOT NULL UNIQUE,
                     description TEXT,
                     default_duration_minutes INTEGER,
-                    status TEXT DEFAULT 'active' -- active, inactive
+                    status TEXT DEFAULT 'active' 
                 );
             """)
             # 教练表
@@ -76,9 +78,38 @@ def create_tables():
                     name TEXT NOT NULL,
                     specialty TEXT,
                     contact_info TEXT,
-                    status TEXT DEFAULT 'active' -- active, inactive
+                    status TEXT DEFAULT 'active' 
                 );
             """)
+
+            # 新增：会员与课程的报名/关系表
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS member_course_enrollments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    member_id INTEGER NOT NULL,
+                    course_id INTEGER NOT NULL,
+                    enrollment_date TEXT NOT NULL,
+                    status TEXT DEFAULT 'enrolled', -- e.g., enrolled, completed, dropped
+                    notes TEXT,
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE 
+                );
+            """)
+
+            # 新增：会员与教练的分配/关系表
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS member_trainer_assignments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    member_id INTEGER NOT NULL,
+                    trainer_id INTEGER NOT NULL,
+                    assignment_date TEXT NOT NULL,
+                    assignment_type TEXT, -- e.g., personal_training_package, consultation
+                    notes TEXT,
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
+                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE
+                );
+            """)
+            
             conn.commit()
             print("数据库表创建成功或已存在。")
         except sqlite3.Error as e:
@@ -89,7 +120,6 @@ def create_tables():
         print("错误！无法创建数据库连接。")
 
 if __name__ == '__main__':
-    # 确保db目录存在
     if not os.path.exists(DATABASE_DIR):
         os.makedirs(DATABASE_DIR)
     create_tables()

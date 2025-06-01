@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 from db import database_operations as db_ops
 from tkcalendar import DateEntry # 需要 pip install tkcalendar
+from .member_detail_window import MemberDetailWindow # 新增导入
 
 class MemberWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("会员管理")
-        self.geometry("1000x600")
-        self.parent = parent
+        self.geometry("1000x650") # 稍微增加高度以容纳返回按钮
+        self.parent = parent # parent 是 MainWindow 实例
 
         # 样式
         style = ttk.Style(self)
@@ -127,7 +128,20 @@ class MemberWindow(tk.Toplevel):
         self.delete_button = ttk.Button(action_frame, text="删除选中会员 (逻辑)", command=self.delete_selected_member)
         self.delete_button.pack(side=tk.LEFT, padx=5)
 
+        self.detail_button = ttk.Button(action_frame, text="查看选中会员详情", command=self.open_member_details)
+        self.detail_button.pack(side=tk.LEFT, padx=5)
+
+        self.return_button = ttk.Button(action_frame, text="返回主页", command=self.close_and_return_to_main)
+        self.return_button.pack(side=tk.RIGHT, padx=5)
+
+
         self.load_members()
+        self.tree.bind("<Double-1>", lambda e: self.open_member_details()) # 双击打开详情
+        self.protocol("WM_DELETE_WINDOW", self.close_and_return_to_main) # 覆盖关闭按钮行为
+
+    def close_and_return_to_main(self):
+        self.parent.show_main_window() # 调用父窗口的方法来显示它
+        self.destroy() # 关闭当前窗口
 
     def clear_form(self):
         self.name_entry.delete(0, tk.END)
@@ -191,8 +205,31 @@ class MemberWindow(tk.Toplevel):
         member_details = self.tree.item(selected_item)
         return member_details['values'][0] # ID 在第一列
 
+    def get_selected_member_id_and_name(self):
+        selected_item = self.tree.focus() 
+        if not selected_item:
+            messagebox.showwarning("提示", "请先选择一个会员。", parent=self)
+            return None, None
+        member_details_list = self.tree.item(selected_item)['values']
+        member_id = member_details_list[0] 
+        member_name = member_details_list[1]
+        return member_id, member_name
+
+    def open_member_details(self):
+        member_id, member_name = self.get_selected_member_id_and_name()
+        if member_id is None:
+            return
+        
+        # Hide current MemberWindow, show it back when MemberDetailWindow closes (handled by MemberDetailWindow)
+        self.parent.withdraw() # Withdraw MainWindow
+        # self.withdraw() # Withdraw MemberWindow itself if MemberDetailWindow's parent is MainWindow
+        
+        # The MemberDetailWindow's parent should be the MainWindow for consistent return behavior
+        detail_win = MemberDetailWindow(self.parent, member_id, member_name)
+        # No grab_set here if MemberWindow is hidden, or make MemberDetailWindow modal to MainWindow
+
     def edit_selected_member(self):
-        member_id = self.get_selected_member_id()
+        member_id, member_name = self.get_selected_member_id_and_name()
         if member_id is None:
             return
 
