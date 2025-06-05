@@ -1,0 +1,206 @@
+const API_BASE_URL = 'http://localhost:5000/api';
+
+class ApiClient {
+    async request(endpoint, options = {}) {
+        const url = `${API_BASE_URL}${endpoint}`;
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        };
+
+        try {
+            const response = await fetch(url, config);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('API request failed:', error);
+            return { success: false, message: '网络请求失败' };
+        }
+    }
+
+    // 会员API
+    async getMembers() {
+        return this.request('/members');
+    }
+
+    async getMember(id) {
+        return this.request(`/members/${id}`);
+    }
+
+    async createMember(memberData) {
+        return this.request('/members', {
+            method: 'POST',
+            body: JSON.stringify(memberData)
+        });
+    }
+
+    async updateMember(id, memberData) {
+        return this.request(`/members/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(memberData)
+        });
+    }
+
+    async deleteMember(id) {
+        return this.request(`/members/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // 教练API
+    async getTrainers(activeOnly = false) {
+        return this.request(`/trainers?active_only=${activeOnly}`);
+    }
+
+    async createTrainer(trainerData) {
+        return this.request('/trainers', {
+            method: 'POST',
+            body: JSON.stringify(trainerData)
+        });
+    }
+
+    async updateTrainer(id, trainerData) {
+        return this.request(`/trainers/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(trainerData)
+        });
+    }
+
+    async deleteTrainer(id) {
+        return this.request(`/trainers/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async searchTrainers(term) {
+        return this.request(`/trainers/search?term=${encodeURIComponent(term)}`);
+    }
+
+    // 课程API
+    async getCourses(activeOnly = false) {
+        return this.request(`/courses?active_only=${activeOnly}`);
+    }
+
+    async createCourse(courseData) {
+        return this.request('/courses', {
+            method: 'POST',
+            body: JSON.stringify(courseData)
+        });
+    }
+
+    async updateCourse(id, courseData) {
+        return this.request(`/courses/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(courseData)
+        });
+    }
+
+    async deleteCourse(id) {
+        return this.request(`/courses/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // 会员卡类型API
+    async getCardTypes() {
+        return this.request('/card-types');
+    }
+
+    async createCardType(cardTypeData) {
+        return this.request('/card-types', {
+            method: 'POST',
+            body: JSON.stringify(cardTypeData)
+        });
+    }
+
+    async updateCardType(id, cardTypeData) {
+        return this.request(`/card-types/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(cardTypeData)
+        });
+    }
+
+    async deleteCardType(id) {
+        return this.request(`/card-types/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // 会员详情API
+    async getMemberCards(memberId) {
+        return this.request(`/members/${memberId}/cards`);
+    }
+
+    async assignCardToMember(memberId, cardData) {
+        return this.request(`/members/${memberId}/cards`, {
+            method: 'POST',
+            body: JSON.stringify(cardData)
+        });
+    }
+
+    async updateMemberCard(cardId, cardData) {
+        return this.request(`/member-cards/${cardId}`, {
+            method: 'PUT',
+            body: JSON.stringify(cardData)
+        });
+    }
+
+    async deleteMemberCard(cardId) {
+        return this.request(`/member-cards/${cardId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async getMemberEnrollments(memberId) {
+        return this.request(`/members/${memberId}/enrollments`);
+    }
+
+    async enrollMemberInCourse(memberId, enrollmentData) {
+        return this.request(`/members/${memberId}/enrollments`, {
+            method: 'POST',
+            body: JSON.stringify(enrollmentData)
+        });
+    }
+
+    async updateEnrollment(enrollmentId, enrollmentData) {
+        return this.request(`/enrollments/${enrollmentId}`, {
+            method: 'PUT',
+            body: JSON.stringify(enrollmentData)
+        });
+    }
+
+    async deleteEnrollment(enrollmentId) {
+        return this.request(`/enrollments/${enrollmentId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async getMemberAssignments(memberId) {
+        return this.request(`/members/${memberId}/assignments`);
+    }
+
+    async assignTrainerToMember(memberId, assignmentData) {
+        return this.request(`/members/${memberId}/assignments`, {
+            method: 'POST',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async updateAssignment(assignmentId, assignmentData) {
+        return this.request(`/assignments/${assignmentId}`, {
+            method: 'PUT',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async deleteAssignment(assignmentId) {
+        return this.request(`/assignments/${assignmentId}`, {
+            method: 'DELETE'
+        });
+    }
+}
+
+const api = new ApiClient();

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身房会员管理系统</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>健身房会员管理系统</h1>
+            <div id="devWarning" class="dev-warning" style="display: none;">
+                <span>⚠️ 开发模式 - 仅用于测试</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn" onclick="showSection('dashboard')">首页</button>
+                <button class="nav-btn" onclick="showSection('members')">会员管理</button>
+                <button class="nav-btn" onclick="showSection('trainers')">教练管理</button>
+                <button class="nav-btn" onclick="showSection('courses')">课程管理</button>
+                <button class="nav-btn" onclick="showSection('card-types')">会员卡类型</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <!-- 首页仪表板 -->
+            <section id="dashboard" class="section active">
+                <h2>欢迎使用健身房会员管理系统</h2>
+                <div class="dashboard-cards">
+                    <div class="card" onclick="showSection('members')">
+                        <h3>会员管理</h3>
+                        <p>管理会员信息、办卡、报名课程</p>
+                    </div>
+                    <div class="card" onclick="showSection('trainers')">
+                        <h3>教练管理</h3>
+                        <p>管理教练信息和专长</p>
+                    </div>
+                    <div class="card" onclick="showSection('courses')">
+                        <h3>课程管理</h3>
+                        <p>管理课程信息和安排</p>
+                    </div>
+                    <div class="card" onclick="showSection('card-types')">
+                        <h3>会员卡类型</h3>
+                        <p>管理会员卡类型和价格</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 会员管理 -->
+            <section id="members" class="section">
+                <div class="section-header">
+                    <h2>会员管理</h2>
+                    <button class="btn btn-primary" onclick="showMemberForm()">添加会员</button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="memberSearch" placeholder="搜索会员..." onkeyup="searchMembers()">
+                    <button class="btn" onclick="loadMembers()">刷新</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="membersTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>性别</th>
+                                <th>电话</th>
+                                <th>入会日期</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 教练管理 -->
+            <section id="trainers" class="section">
+                <div class="section-header">
+                    <h2>教练管理</h2>
+                    <button class="btn btn-primary" onclick="showTrainerForm()">添加教练</button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="trainerSearch" placeholder="搜索教练..." onkeyup="searchTrainers()">
+                    <button class="btn" onclick="loadTrainers()">刷新</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="trainersTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>专长</th>
+                                <th>联系方式</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trainersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 课程管理 -->
+            <section id="courses" class="section">
+                <div class="section-header">
+                    <h2>课程管理</h2>
+                    <button class="btn btn-primary" onclick="showCourseForm()">添加课程</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="coursesTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>课程名称</th>
+                                <th>描述</th>
+                                <th>默认时长(分钟)</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coursesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 会员卡类型管理 -->
+            <section id="card-types" class="section">
+                <div class="section-header">
+                    <h2>会员卡类型管理</h2>
+                    <button class="btn btn-primary" onclick="showCardTypeForm()">添加卡类型</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="cardTypesTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>类型名称</th>
+                                <th>价格(元)</th>
+                                <th>有效期(天)</th>
+                                <th>描述</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cardTypesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 会员详情 -->
+            <section id="member-detail" class="section">
+                <div class="section-header">
+                    <h2 id="memberDetailTitle">会员详情</h2>
+                    <button class="btn" onclick="showSection('members')">返回会员列表</button>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('member-cards')">会员卡</button>
+                    <button class="tab-btn" onclick="showTab('member-courses')">已报课程</button>
+                    <button class="tab-btn" onclick="showTab('member-trainers')">指派教练</button>
+                </div>
+
+                <div id="member-cards" class="tab-content active">
+                    <div class="section-header">
+                        <h3>会员卡管理</h3>
+                        <button class="btn btn-primary" onclick="showMemberCardForm()">办理新卡</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="memberCardsTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>卡ID</th>
+                                    <th>卡类型</th>
+                                    <th>购买日期</th>
+                                    <th>激活日期</th>
+                                    <th>失效日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberCardsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="member-courses" class="tab-content">
+                    <div class="section-header">
+                        <h3>已报课程</h3>
+                        <button class="btn btn-primary" onclick="showMemberCourseForm()">报名新课程</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="memberCoursesTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>报名ID</th>
+                                    <th>课程名称</th>
+                                    <th>报名日期</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberCoursesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="member-trainers" class="tab-content">
+                    <div class="section-header">
+                        <h3>指派教练</h3>
+                        <button class="btn btn-primary" onclick="showMemberTrainerForm()">指派新教练</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="memberTrainersTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>指派ID</th>
+                                    <th>教练姓名</th>
+                                    <th>指派日期</th>
+                                    <th>指派类型</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberTrainersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/members.js"></script>
+    <script src="scripts/trainers.js"></script>
+    <script src="scripts/courses.js"></script>
+    <script src="scripts/cardTypes.js"></script>
+    <script src="scripts/memberDetail.js"></script>
+    <script>
+        // 检查是否为开发环境
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            document.getElementById('devWarning').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
