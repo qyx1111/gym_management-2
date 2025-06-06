@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>健身房会员管理系统</title>
+    <title>NUAA健身房会员管理系统</title>
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>健身房会员管理系统</h1>
+            <h1>NUAA身房会员管理系统</h1>
             <div id="devWarning" class="dev-warning" style="display: none;">
                 <span>⚠️ 开发模式 - 仅用于测试</span>
             </div>
@@ -240,6 +240,65 @@
                     </div>
                 </div>
             </section>
+
+            <!-- 教练详情 -->
+            <section id="trainer-detail" class="section">
+                <div class="section-header">
+                    <h2 id="trainerDetailTitle">教练详情</h2>
+                    <button class="btn" onclick="showSection('trainers')">返回教练列表</button>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTrainerTab('trainer-courses')">教学课程</button>
+                    <button class="tab-btn" onclick="showTrainerTab('trainer-members')">指派会员</button>
+                </div>
+
+                <div id="trainer-courses" class="tab-content active">
+                    <div class="section-header">
+                        <h3>教学课程管理</h3>
+                        <button class="btn btn-primary" onclick="showTrainerCourseForm()">分配新课程</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="trainerCoursesTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>分配ID</th>
+                                    <th>课程名称</th>
+                                    <th>分配日期</th>
+                                    <th>课程类型</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trainerCoursesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="trainer-members" class="tab-content">
+                    <div class="section-header">
+                        <h3>指派会员</h3>
+                        <button class="btn btn-primary" onclick="showTrainerMemberForm()">指派新会员</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="trainerMembersTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>指派ID</th>
+                                    <th>会员姓名</th>
+                                    <th>指派日期</th>
+                                    <th>指派类型</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trainerMembersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -258,6 +317,7 @@
     <script src="scripts/courses.js"></script>
     <script src="scripts/cardTypes.js"></script>
     <script src="scripts/memberDetail.js"></script>
+    <script src="scripts/trainerDetail.js"></script>
     <script>
         // 检查是否为开发环境
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

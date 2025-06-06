@@ -109,6 +109,20 @@ def create_tables():
                     FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE
                 );
             """)
+
+            # 新增：教练与课程的分配/关系表
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS trainer_course_assignments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    trainer_id INTEGER NOT NULL,
+                    course_id INTEGER NOT NULL,
+                    assignment_date TEXT NOT NULL,
+                    course_type TEXT, -- e.g., regular, special, private, group
+                    notes TEXT,
+                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+                );
+            """)
             
             conn.commit()
             print("数据库表创建成功或已存在。")

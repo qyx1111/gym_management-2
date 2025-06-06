@@ -1,6 +1,6 @@
 import sqlite3
 from .database_setup import create_connection, DATABASE_NAME
-from datetime import datetime
+from datetime import datetime, date
 
 def add_member(name, gender, birth_date, phone, emergency_contact_name, emergency_contact_phone, health_notes):
     """添加新会员"""
@@ -380,6 +380,8 @@ def delete_trainer_logically(trainer_id):
         return True, "教练已设为非活动状态"
     except sqlite3.Error as e:
         return False, f"逻辑删除教练时发生数据库错误: {e}"
+    finally:
+        conn.close()
 
 # --- Course Operations ---
 
@@ -618,7 +620,7 @@ def enroll_member_in_course(member_id, course_id, enrollment_date, status='enrol
              VALUES (?, ?, ?, ?, ?)'''
     try:
         cursor = conn.cursor()
-        if isinstance(enrollment_date, (datetime, datetime.date)):
+        if isinstance(enrollment_date, (datetime, date)):
             enrollment_date_str = enrollment_date.strftime('%Y-%m-%d')
         else:
             enrollment_date_str = enrollment_date # Assume it's already a string in correct format
@@ -679,7 +681,7 @@ def update_enrollment_details(enrollment_id, course_id, enrollment_date, status,
              WHERE id = ?'''
     try:
         cursor = conn.cursor()
-        if isinstance(enrollment_date, (datetime, datetime.date)):
+        if isinstance(enrollment_date, (datetime, date)):
             enrollment_date_str = enrollment_date.strftime('%Y-%m-%d')
         else:
             enrollment_date_str = enrollment_date
@@ -724,7 +726,7 @@ def assign_trainer_to_member(member_id, trainer_id, assignment_date, assignment_
     try:
         cursor = conn.cursor()
         # Ensure assignment_date is in 'YYYY-MM-DD' format if it's a date object
-        if isinstance(assignment_date, (datetime, datetime.date)):
+        if isinstance(assignment_date, (datetime, date)):
             assignment_date_str = assignment_date.strftime('%Y-%m-%d')
         else:
             assignment_date_str = assignment_date # Assume it's already a string in correct format
@@ -785,7 +787,7 @@ def update_assignment_details(assignment_id, trainer_id, assignment_date, assign
              WHERE id = ?'''
     try:
         cursor = conn.cursor()
-        if isinstance(assignment_date, (datetime, datetime.date)):
+        if isinstance(assignment_date, (datetime, date)):
             assignment_date_str = assignment_date.strftime('%Y-%m-%d')
         else:
             assignment_date_str = assignment_date
@@ -815,5 +817,132 @@ def unassign_trainer_from_member(assignment_id):
         return True, "教练指派解除成功"
     except sqlite3.Error as e:
         return False, f"解除教练指派时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+# --- Trainer Course Assignment Operations ---
+
+def assign_course_to_trainer(trainer_id, course_id, assignment_date, course_type='', notes=''):
+    """为教练分配课程"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''INSERT INTO trainer_course_assignments (trainer_id, course_id, assignment_date, course_type, notes)
+             VALUES (?, ?, ?, ?, ?)'''
+    try:
+        cursor = conn.cursor()
+        if isinstance(assignment_date, (datetime, date)):
+            assignment_date_str = assignment_date.strftime('%Y-%m-%d')
+        else:
+            assignment_date_str = assignment_date
+
+        cursor.execute(sql, (trainer_id, course_id, assignment_date_str, course_type, notes))
+        conn.commit()
+        return True, "课程分配成功"
+    except sqlite3.Error as e:
+        return False, f"课程分配时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def get_courses_for_trainer(trainer_id):
+    """获取指定教练的所有课程分配信息"""
+    conn = create_connection()
+    if not conn:
+        return []
+    sql = """
+        SELECT tca.id, c.name, tca.assignment_date, tca.course_type, tca.notes, tca.course_id
+        FROM trainer_course_assignments tca
+        JOIN courses c ON tca.course_id = c.id
+        WHERE tca.trainer_id = ?
+        ORDER BY tca.assignment_date DESC
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (trainer_id,))
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"查询教练课程分配信息时发生错误: {e}")
+        return []
+    finally:
+        conn.close()
+
+def get_trainer_course_details(assignment_id):
+    """获取特定教练课程分配记录的详细信息"""
+    conn = create_connection()
+    if not conn:
+        return None
+    sql = "SELECT id, trainer_id, course_id, assignment_date, course_type, notes FROM trainer_course_assignments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (assignment_id,))
+        return cursor.fetchone()
+    except sqlite3.Error as e:
+        print(f"获取教练课程分配详情时出错: {e}")
+        return None
+    finally:
+        conn.close()
+
+def update_trainer_course_assignment(assignment_id, course_id, assignment_date, course_type, notes):
+    """更新教练课程分配信息"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = '''UPDATE trainer_course_assignments
+             SET course_id = ?, assignment_date = ?, course_type = ?, notes = ?
+             WHERE id = ?'''
+    try:
+        cursor = conn.cursor()
+        if isinstance(assignment_date, (datetime, date)):
+            assignment_date_str = assignment_date.strftime('%Y-%m-%d')
+        else:
+            assignment_date_str = assignment_date
+
+        cursor.execute(sql, (course_id, assignment_date_str, course_type, notes, assignment_id))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到该课程分配记录或信息无变化"
+        return True, "教练课程分配信息更新成功"
+    except sqlite3.Error as e:
+        return False, f"更新教练课程分配信息时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def delete_trainer_course_assignment(assignment_id):
+    """删除教练的课程分配"""
+    conn = create_connection()
+    if not conn:
+        return False, "数据库连接失败"
+    sql = "DELETE FROM trainer_course_assignments WHERE id = ?"
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (assignment_id,))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return False, "未找到要删除的课程分配记录"
+        return True, "教练课程分配取消成功"
+    except sqlite3.Error as e:
+        return False, f"取消教练课程分配时发生数据库错误: {e}"
+    finally:
+        conn.close()
+
+def get_members_for_trainer(trainer_id):
+    """获取指定教练的所有会员指派信息（从会员视角查看）"""
+    conn = create_connection()
+    if not conn:
+        return []
+    sql = """
+        SELECT mta.id, m.name, mta.assignment_date, mta.assignment_type, mta.notes, mta.member_id
+        FROM member_trainer_assignments mta
+        JOIN members m ON mta.member_id = m.id
+        WHERE mta.trainer_id = ?
+        ORDER BY mta.assignment_date DESC
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (trainer_id,))
+        return cursor.fetchall()
+    except sqlite3.Error as e:
+        print(f"查询教练会员指派信息时发生错误: {e}")
+        return []
     finally:
         conn.close()

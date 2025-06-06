@@ -16,6 +16,7 @@ async function loadTrainers() {
                 <td>${trainer.contact_info || ''}</td>
                 <td>${trainer.status}</td>
                 <td>
+                    <button class="btn btn-success" onclick="showTrainerDetail(${trainer.id}, '${trainer.name}')">查看详情</button>
                     <button class="btn" onclick="editTrainer(${trainer.id})">编辑</button>
                     <button class="btn btn-danger" onclick="deleteTrainer(${trainer.id}, '${trainer.name}')">删除</button>
                 </td>
@@ -54,6 +55,7 @@ async function searchTrainers() {
                     <td>${trainer.contact_info || ''}</td>
                     <td>${trainer.status}</td>
                     <td>
+                        <button class="btn btn-success" onclick="showTrainerDetail(${trainer.id}, '${trainer.name}')">查看详情</button>
                         <button class="btn" onclick="editTrainer(${trainer.id})">编辑</button>
                         <button class="btn btn-danger" onclick="deleteTrainer(${trainer.id}, '${trainer.name}')">删除</button>
                     </td>
@@ -164,4 +166,13 @@ async function deleteTrainer(id, name) {
             showMessage(response.message, 'error');
         }
     });
+}
+
+// 显示教练详情
+function showTrainerDetail(id, name) {
+    currentTrainerId = id;
+    document.getElementById('trainerDetailTitle').textContent = `教练详情 - ${name} (ID: ${id})`;
+    showSection('trainer-detail');
+    showTrainerTab('trainer-courses');
+    loadTrainerCourses(id);
 }

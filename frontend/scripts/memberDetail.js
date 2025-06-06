@@ -203,7 +203,193 @@ async function saveMemberCard(cardId) {
     }
 }
 
-// 其他会员详情相关函数
+// 显示课程报名表单
+async function showMemberCourseForm(enrollmentId = null) {
+    const courses = await api.getCourses();
+    if (!courses.success) {
+        showMessage('无法加载课程列表', 'error');
+        return;
+    }
+    
+    let enrollment = null;
+    if (enrollmentId) {
+        const enrollmentsResponse = await api.getMemberEnrollments(currentMemberId);
+        if (enrollmentsResponse.success) {
+            enrollment = enrollmentsResponse.data.find(e => e.id === enrollmentId);
+        }
+    }
+    
+    const title = enrollment ? '编辑课程报名' : '新课程报名';
+    const courseOptions = courses.data.map(course => 
+        `<option value="${course.id}" ${enrollment && enrollment.course_id === course.id ? 'selected' : ''}>${course.name}</option>`
+    ).join('');
+    
+    const formContent = `
+        <div class="form">
+            <h3>${title}</h3>
+            <div class="form-group">
+                <label for="memberCourse">课程 *</label>
+                <select id="memberCourse" required>
+                    <option value="">请选择课程</option>
+                    ${courseOptions}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="memberEnrollmentDate">报名日期 *</label>
+                <input type="date" id="memberEnrollmentDate" value="${enrollment ? enrollment.enrollment_date.split(' ')[0] : getTodayDate()}" required>
+            </div>
+            <div class="form-group">
+                <label for="memberEnrollmentStatus">状态</label>
+                <select id="memberEnrollmentStatus">
+                    <option value="已报名" ${enrollment && enrollment.status === '已报名' ? 'selected' : ''}>已报名</option>
+                    <option value="进行中" ${enrollment && enrollment.status === '进行中' ? 'selected' : ''}>进行中</option>
+                    <option value="已完成" ${enrollment && enrollment.status === '已完成' ? 'selected' : ''}>已完成</option>
+                    <option value="已取消" ${enrollment && enrollment.status === '已取消' ? 'selected' : ''}>已取消</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="memberEnrollmentNotes">备注</label>
+                <textarea id="memberEnrollmentNotes">${enrollment ? enrollment.notes || '' : ''}</textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" onclick="closeModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMemberEnrollment(${enrollmentId || 'null'})">${enrollment ? '更新' : '报名'}</button>
+            </div>
+        </div>
+    `;
+    
+    showModal(formContent);
+}
+
+// 保存课程报名
+async function saveMemberEnrollment(enrollmentId) {
+    const enrollmentData = {
+        course_id: parseInt(document.getElementById('memberCourse').value),
+        enrollment_date: document.getElementById('memberEnrollmentDate').value,
+        status: document.getElementById('memberEnrollmentStatus').value,
+        notes: document.getElementById('memberEnrollmentNotes').value.trim()
+    };
+    
+    if (!enrollmentData.course_id) {
+        showMessage('请选择课程', 'error');
+        return;
+    }
+    
+    if (!enrollmentData.enrollment_date) {
+        showMessage('报名日期不能为空', 'error');
+        return;
+    }
+    
+    let response;
+    if (enrollmentId) {
+        response = await api.updateMemberEnrollment(enrollmentId, enrollmentData);
+    } else {
+        response = await api.enrollMemberInCourse(currentMemberId, enrollmentData);
+    }
+    
+    if (response.success) {
+        showMessage(response.message, 'success');
+        closeModal();
+        loadMemberEnrollments(currentMemberId);
+    } else {
+        showMessage(response.message, 'error');
+    }
+}
+
+// 显示教练指派表单
+async function showMemberTrainerForm(assignmentId = null) {
+    const trainers = await api.getTrainers();
+    if (!trainers.success) {
+        showMessage('无法加载教练列表', 'error');
+        return;
+    }
+    
+    let assignment = null;
+    if (assignmentId) {
+        const assignmentsResponse = await api.getMemberAssignments(currentMemberId);
+        if (assignmentsResponse.success) {
+            assignment = assignmentsResponse.data.find(a => a.id === assignmentId);
+        }
+    }
+    
+    const title = assignment ? '编辑教练指派' : '指派教练';
+    const trainerOptions = trainers.data.map(trainer => 
+        `<option value="${trainer.id}" ${assignment && assignment.trainer_id === trainer.id ? 'selected' : ''}>${trainer.name}</option>`
+    ).join('');
+    
+    const formContent = `
+        <div class="form">
+            <h3>${title}</h3>
+            <div class="form-group">
+                <label for="memberTrainer">教练 *</label>
+                <select id="memberTrainer" required>
+                    <option value="">请选择教练</option>
+                    ${trainerOptions}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="memberAssignmentDate">指派日期 *</label>
+                <input type="date" id="memberAssignmentDate" value="${assignment ? assignment.assignment_date.split(' ')[0] : getTodayDate()}" required>
+            </div>
+            <div class="form-group">
+                <label for="memberAssignmentType">指派类型</label>
+                <select id="memberAssignmentType">
+                    <option value="">请选择类型</option>
+                    <option value="personal" ${assignment && assignment.assignment_type === 'personal' ? 'selected' : ''}>私教</option>
+                    <option value="group" ${assignment && assignment.assignment_type === 'group' ? 'selected' : ''}>团体课</option>
+                    <option value="consultation" ${assignment && assignment.assignment_type === 'consultation' ? 'selected' : ''}>咨询</option>
+                    <option value="assessment" ${assignment && assignment.assignment_type === 'assessment' ? 'selected' : ''}>体能评估</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="memberAssignmentNotes">备注</label>
+                <textarea id="memberAssignmentNotes">${assignment ? assignment.notes || '' : ''}</textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn" onclick="closeModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMemberAssignment(${assignmentId || 'null'})">${assignment ? '更新' : '指派'}</button>
+            </div>
+        </div>
+    `;
+    
+    showModal(formContent);
+}
+
+// 保存教练指派
+async function saveMemberAssignment(assignmentId) {
+    const assignmentData = {
+        trainer_id: parseInt(document.getElementById('memberTrainer').value),
+        assignment_date: document.getElementById('memberAssignmentDate').value,
+        assignment_type: document.getElementById('memberAssignmentType').value,
+        notes: document.getElementById('memberAssignmentNotes').value.trim()
+    };
+    
+    if (!assignmentData.trainer_id) {
+        showMessage('请选择教练', 'error');
+        return;
+    }
+    
+    if (!assignmentData.assignment_date) {
+        showMessage('指派日期不能为空', 'error');
+        return;
+    }
+    
+    let response;
+    if (assignmentId) {
+        response = await api.updateMemberAssignment(assignmentId, assignmentData);
+    } else {
+        response = await api.assignTrainerToMember(currentMemberId, assignmentData);
+    }
+    
+    if (response.success) {
+        showMessage(response.message, 'success');
+        closeModal();
+        loadMemberAssignments(currentMemberId);
+    } else {
+        showMessage(response.message, 'error');
+    }
+}
+
 function editMemberCard(cardId) {
     showMemberCardForm(cardId);
 }
@@ -220,27 +406,34 @@ function deleteMemberCard(cardId, cardTypeName) {
     });
 }
 
-// 类似地实现课程和教练的表单函数...
-function showMemberCourseForm() {
-    showMessage('课程报名功能开发中...', 'warning');
-}
-
-function showMemberTrainerForm() {
-    showMessage('教练指派功能开发中...', 'warning');
-}
-
 function editMemberEnrollment(enrollmentId) {
-    showMessage('编辑功能开发中...', 'warning');
+    showMemberCourseForm(enrollmentId);
 }
 
 function deleteMemberEnrollment(enrollmentId, courseName) {
-    showMessage('取消功能开发中...', 'warning');
+    confirmAction(`确定要取消 "${courseName}" 课程报名吗？`, async () => {
+        const response = await api.deleteMemberEnrollment(enrollmentId);
+        if (response.success) {
+            showMessage(response.message, 'success');
+            loadMemberEnrollments(currentMemberId);
+        } else {
+            showMessage(response.message, 'error');
+        }
+    });
 }
 
 function editMemberAssignment(assignmentId) {
-    showMessage('编辑功能开发中...', 'warning');
+    showMemberTrainerForm(assignmentId);
 }
 
 function deleteMemberAssignment(assignmentId, trainerName) {
-    showMessage('解除功能开发中...', 'warning');
+    confirmAction(`确定要解除与教练 "${trainerName}" 的指派关系吗？`, async () => {
+        const response = await api.deleteMemberAssignment(assignmentId);
+        if (response.success) {
+            showMessage(response.message, 'success');
+            loadMemberAssignments(currentMemberId);
+        } else {
+            showMessage(response.message, 'error');
+        }
+    });
 }

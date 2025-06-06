@@ -165,14 +165,14 @@ class ApiClient {
         });
     }
 
-    async updateEnrollment(enrollmentId, enrollmentData) {
+    async updateMemberEnrollment(enrollmentId, enrollmentData) {
         return this.request(`/enrollments/${enrollmentId}`, {
             method: 'PUT',
             body: JSON.stringify(enrollmentData)
         });
     }
 
-    async deleteEnrollment(enrollmentId) {
+    async deleteMemberEnrollment(enrollmentId) {
         return this.request(`/enrollments/${enrollmentId}`, {
             method: 'DELETE'
         });
@@ -189,15 +189,64 @@ class ApiClient {
         });
     }
 
-    async updateAssignment(assignmentId, assignmentData) {
+    async updateMemberAssignment(assignmentId, assignmentData) {
         return this.request(`/assignments/${assignmentId}`, {
             method: 'PUT',
             body: JSON.stringify(assignmentData)
         });
     }
 
-    async deleteAssignment(assignmentId) {
+    async deleteMemberAssignment(assignmentId) {
         return this.request(`/assignments/${assignmentId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // 教练详情API
+    async getTrainerCourses(trainerId) {
+        return this.request(`/trainers/${trainerId}/courses`);
+    }
+
+    async assignCourseToTrainer(trainerId, assignmentData) {
+        return this.request(`/trainers/${trainerId}/courses`, {
+            method: 'POST',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async updateTrainerCourse(assignmentId, assignmentData) {
+        return this.request(`/trainer-courses/${assignmentId}`, {
+            method: 'PUT',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async deleteTrainerCourse(assignmentId) {
+        return this.request(`/trainer-courses/${assignmentId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    async getTrainerMembers(trainerId) {
+        return this.request(`/trainers/${trainerId}/members`);
+    }
+
+    async assignMemberToTrainer(trainerId, assignmentData) {
+        return this.request(`/trainers/${trainerId}/members`, {
+            method: 'POST',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async updateTrainerMember(assignmentId, assignmentData) {
+        return this.request(`/trainer-members/${assignmentId}`, {
+            method: 'PUT',
+            body: JSON.stringify(assignmentData)
+        });
+    }
+
+    async deleteTrainerMember(assignmentId) {
+        return this.request(`/trainer-members/${assignmentId}`, {
             method: 'DELETE'
         });
     }

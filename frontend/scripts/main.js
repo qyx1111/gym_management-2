@@ -1,5 +1,6 @@
 // 全局变量
 let currentMemberId = null;
+let currentTrainerId = null;
 let currentEditingItem = null;
 
 // 显示指定区域
@@ -58,6 +59,37 @@ function showTab(tabId) {
                 break;
             case 'member-trainers':
                 loadMemberAssignments(currentMemberId);
+                break;
+        }
+    }
+}
+
+// 显示教练标签页
+function showTrainerTab(tabId) {
+    // 隐藏所有标签内容
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // 移除所有标签按钮的active类
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // 显示指定标签内容
+    document.getElementById(tabId).classList.add('active');
+    
+    // 激活对应的标签按钮
+    event.target.classList.add('active');
+    
+    // 根据标签加载数据
+    if (currentTrainerId) {
+        switch(tabId) {
+            case 'trainer-courses':
+                loadTrainerCourses(currentTrainerId);
+                break;
+            case 'trainer-members':
+                loadTrainerMembers(currentTrainerId);
                 break;
         }
     }

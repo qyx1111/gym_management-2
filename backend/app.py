@@ -346,6 +346,54 @@ def delete_assignment(assignment_id):
     success, message = db_ops.unassign_trainer_from_member(assignment_id)
     return jsonify({'success': success, 'message': message})
 
+# 教练详细信息API
+@app.route('/api/trainers/<int:trainer_id>/courses', methods=['GET'])
+@handle_api_errors
+def get_trainer_courses(trainer_id):
+    """获取教练的课程分配"""
+    courses = db_ops.get_courses_for_trainer(trainer_id)
+    return jsonify({
+        'success': True,
+        'data': [dict(zip(['id', 'course_name', 'assignment_date', 'course_type', 'notes', 'course_id'], course)) for course in courses]
+    })
+
+@app.route('/api/trainers/<int:trainer_id>/courses', methods=['POST'])
+@handle_api_errors
+def assign_course_to_trainer_api(trainer_id):
+    """为教练分配课程"""
+    data = request.json
+    success, message = db_ops.assign_course_to_trainer(
+        trainer_id, data['course_id'], data['assignment_date'], data.get('course_type', ''), data.get('notes', '')
+    )
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/trainer-courses/<int:assignment_id>', methods=['PUT'])
+@handle_api_errors
+def update_trainer_course(assignment_id):
+    """更新教练课程分配信息"""
+    data = request.json
+    success, message = db_ops.update_trainer_course_assignment(
+        assignment_id, data['course_id'], data['assignment_date'], data.get('course_type', ''), data.get('notes', '')
+    )
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/trainer-courses/<int:assignment_id>', methods=['DELETE'])
+@handle_api_errors
+def delete_trainer_course(assignment_id):
+    """取消教练课程分配"""
+    success, message = db_ops.delete_trainer_course_assignment(assignment_id)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/api/trainers/<int:trainer_id>/members', methods=['GET'])
+@handle_api_errors
+def get_trainer_members(trainer_id):
+    """获取教练的会员指派"""
+    members = db_ops.get_members_for_trainer(trainer_id)
+    return jsonify({
+        'success': True,
+        'data': [dict(zip(['id', 'member_name', 'assignment_date', 'assignment_type', 'notes', 'member_id'], member)) for member in members]
+    })
+
 if __name__ == '__main__':
     if not init_database():
         print("数据库初始化失败，程序退出")
