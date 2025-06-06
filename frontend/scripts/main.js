@@ -3,6 +3,40 @@ let currentMemberId = null;
 let currentTrainerId = null;
 let currentEditingItem = null;
 
+// 加载仪表板统计数据
+async function loadDashboardStats() {
+    try {
+        // 加载会员统计
+        const membersResponse = await api.getMembers();
+        if (membersResponse.success) {
+            const activeMembersCount = membersResponse.data.filter(m => m.status === 'active').length;
+            document.getElementById('membersCount').textContent = activeMembersCount;
+        }
+
+        // 加载教练统计
+        const trainersResponse = await api.getTrainers();
+        if (trainersResponse.success) {
+            const activeTrainersCount = trainersResponse.data.filter(t => t.status === 'active').length;
+            document.getElementById('trainersCount').textContent = activeTrainersCount;
+        }
+
+        // 加载课程统计
+        const coursesResponse = await api.getCourses();
+        if (coursesResponse.success) {
+            const activeCoursesCount = coursesResponse.data.filter(c => c.status === 'active').length;
+            document.getElementById('coursesCount').textContent = activeCoursesCount;
+        }
+
+        // 加载会员卡类型统计
+        const cardTypesResponse = await api.getCardTypes();
+        if (cardTypesResponse.success) {
+            document.getElementById('cardTypesCount').textContent = cardTypesResponse.data.length;
+        }
+    } catch (error) {
+        console.error('加载仪表板统计数据失败:', error);
+    }
+}
+
 // 显示指定区域
 function showSection(sectionId) {
     // 隐藏所有区域
@@ -15,6 +49,9 @@ function showSection(sectionId) {
     
     // 根据区域加载数据
     switch(sectionId) {
+        case 'dashboard':
+            loadDashboardStats();
+            break;
         case 'members':
             loadMembers();
             break;
@@ -161,4 +198,31 @@ window.onclick = function(event) {
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     showSection('dashboard');
+    
+    // 添加键盘快捷键支持
+    document.addEventListener('keydown', function(e) {
+        // Esc键关闭模态框
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+        
+        // Ctrl+Enter保存表单
+        if (e.ctrlKey && e.key === 'Enter') {
+            const saveButton = document.querySelector('.modal .btn-primary');
+            if (saveButton && saveButton.onclick) {
+                saveButton.click();
+            }
+        }
+    });
+    
+    // 添加页面可见性变化监听
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            // 页面重新获得焦点时刷新当前数据
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection && activeSection.id !== 'dashboard') {
+                showSection(activeSection.id);
+            }
+        }
+    });
 });

@@ -5,43 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NUAA健身房会员管理系统</title>
     <link rel="stylesheet" href="styles/main.css">
+    <!-- 添加Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 添加Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>NUAA健身房会员管理系统</h1>
-            <div id="devWarning" class="dev-warning" style="display: none;">
-                <span>⚠️ 开发模式 - 仅用于测试</span>
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-dumbbell header-icon"></i>
+                    <h1>NUAA健身房会员管理系统</h1>
+                </div>
+                <div id="devWarning" class="dev-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>开发模式 - 仅用于测试</span>
+                </div>
             </div>
             <nav class="nav">
-                <button class="nav-btn" onclick="showSection('dashboard')">首页</button>
-                <button class="nav-btn" onclick="showSection('members')">会员管理</button>
-                <button class="nav-btn" onclick="showSection('trainers')">教练管理</button>
-                <button class="nav-btn" onclick="showSection('courses')">课程管理</button>
-                <button class="nav-btn" onclick="showSection('card-types')">会员卡类型</button>
+                <button class="nav-btn" onclick="showSection('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('members')">
+                    <i class="fas fa-users"></i>
+                    <span>会员管理</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('trainers')">
+                    <i class="fas fa-user-tie"></i>
+                    <span>教练管理</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('courses')">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>课程管理</span>
+                </button>
+                <button class="nav-btn" onclick="showSection('card-types')">
+                    <i class="fas fa-credit-card"></i>
+                    <span>会员卡类型</span>
+                </button>
             </nav>
         </header>
 
         <main class="main">
             <!-- 首页仪表板 -->
             <section id="dashboard" class="section active">
-                <h2>欢迎使用健身房会员管理系统</h2>
+                <div class="welcome-banner">
+                    <h2><i class="fas fa-chart-line"></i> 欢迎使用健身房会员管理系统</h2>
+                    <p>高效管理您的健身房业务</p>
+                </div>
                 <div class="dashboard-cards">
-                    <div class="card" onclick="showSection('members')">
-                        <h3>会员管理</h3>
-                        <p>管理会员信息、办卡、报名课程</p>
+                    <div class="card members-card" onclick="showSection('members')">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>会员管理</h3>
+                            <p>管理会员信息、办卡、报名课程</p>
+                            <div class="card-stats">
+                                <span class="stats-number" id="membersCount">-</span>
+                                <span class="stats-label">活跃会员</span>
+                            </div>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
                     </div>
-                    <div class="card" onclick="showSection('trainers')">
-                        <h3>教练管理</h3>
-                        <p>管理教练信息和专长</p>
+                    <div class="card trainers-card" onclick="showSection('trainers')">
+                        <div class="card-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>教练管理</h3>
+                            <p>管理教练信息和专长</p>
+                            <div class="card-stats">
+                                <span class="stats-number" id="trainersCount">-</span>
+                                <span class="stats-label">专业教练</span>
+                            </div>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
                     </div>
-                    <div class="card" onclick="showSection('courses')">
-                        <h3>课程管理</h3>
-                        <p>管理课程信息和安排</p>
+                    <div class="card courses-card" onclick="showSection('courses')">
+                        <div class="card-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>课程管理</h3>
+                            <p>管理课程信息和安排</p>
+                            <div class="card-stats">
+                                <span class="stats-number" id="coursesCount">-</span>
+                                <span class="stats-label">热门课程</span>
+                            </div>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
                     </div>
-                    <div class="card" onclick="showSection('card-types')">
-                        <h3>会员卡类型</h3>
-                        <p>管理会员卡类型和价格</p>
+                    <div class="card cards-card" onclick="showSection('card-types')">
+                        <div class="card-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>会员卡类型</h3>
+                            <p>管理会员卡类型和价格</p>
+                            <div class="card-stats">
+                                <span class="stats-number" id="cardTypesCount">-</span>
+                                <span class="stats-label">卡类型</span>
+                            </div>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -49,26 +125,38 @@
             <!-- 会员管理 -->
             <section id="members" class="section">
                 <div class="section-header">
-                    <h2>会员管理</h2>
-                    <button class="btn btn-primary" onclick="showMemberForm()">添加会员</button>
+                    <div class="section-title">
+                        <i class="fas fa-users section-icon"></i>
+                        <h2>会员管理</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showMemberForm()">
+                        <i class="fas fa-plus"></i>
+                        <span>添加会员</span>
+                    </button>
                 </div>
                 
                 <div class="search-bar">
-                    <input type="text" id="memberSearch" placeholder="搜索会员..." onkeyup="searchMembers()">
-                    <button class="btn" onclick="loadMembers()">刷新</button>
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="memberSearch" placeholder="搜索会员姓名或电话..." onkeyup="searchMembers()">
+                    </div>
+                    <button class="btn btn-refresh" onclick="loadMembers()">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新</span>
+                    </button>
                 </div>
 
                 <div class="table-container">
                     <table id="membersTable" class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>姓名</th>
-                                <th>性别</th>
-                                <th>电话</th>
-                                <th>入会日期</th>
-                                <th>状态</th>
-                                <th>操作</th>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-user"></i> 姓名</th>
+                                <th><i class="fas fa-venus-mars"></i> 性别</th>
+                                <th><i class="fas fa-phone"></i> 电话</th>
+                                <th><i class="fas fa-calendar"></i> 入会日期</th>
+                                <th><i class="fas fa-signal"></i> 状态</th>
+                                <th><i class="fas fa-cogs"></i> 操作</th>
                             </tr>
                         </thead>
                         <tbody id="membersTableBody">
@@ -80,25 +168,37 @@
             <!-- 教练管理 -->
             <section id="trainers" class="section">
                 <div class="section-header">
-                    <h2>教练管理</h2>
-                    <button class="btn btn-primary" onclick="showTrainerForm()">添加教练</button>
+                    <div class="section-title">
+                        <i class="fas fa-user-tie section-icon"></i>
+                        <h2>教练管理</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showTrainerForm()">
+                        <i class="fas fa-plus"></i>
+                        <span>添加教练</span>
+                    </button>
                 </div>
                 
                 <div class="search-bar">
-                    <input type="text" id="trainerSearch" placeholder="搜索教练..." onkeyup="searchTrainers()">
-                    <button class="btn" onclick="loadTrainers()">刷新</button>
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="trainerSearch" placeholder="搜索教练姓名或专长..." onkeyup="searchTrainers()">
+                    </div>
+                    <button class="btn btn-refresh" onclick="loadTrainers()">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新</span>
+                    </button>
                 </div>
 
                 <div class="table-container">
                     <table id="trainersTable" class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>姓名</th>
-                                <th>专长</th>
-                                <th>联系方式</th>
-                                <th>状态</th>
-                                <th>操作</th>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-user"></i> 姓名</th>
+                                <th><i class="fas fa-star"></i> 专长</th>
+                                <th><i class="fas fa-phone"></i> 联系方式</th>
+                                <th><i class="fas fa-signal"></i> 状态</th>
+                                <th><i class="fas fa-cogs"></i> 操作</th>
                             </tr>
                         </thead>
                         <tbody id="trainersTableBody">
@@ -110,20 +210,26 @@
             <!-- 课程管理 -->
             <section id="courses" class="section">
                 <div class="section-header">
-                    <h2>课程管理</h2>
-                    <button class="btn btn-primary" onclick="showCourseForm()">添加课程</button>
+                    <div class="section-title">
+                        <i class="fas fa-graduation-cap section-icon"></i>
+                        <h2>课程管理</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCourseForm()">
+                        <i class="fas fa-plus"></i>
+                        <span>添加课程</span>
+                    </button>
                 </div>
                 
                 <div class="table-container">
                     <table id="coursesTable" class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>课程名称</th>
-                                <th>描述</th>
-                                <th>默认时长(分钟)</th>
-                                <th>状态</th>
-                                <th>操作</th>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-graduation-cap"></i> 课程名称</th>
+                                <th><i class="fas fa-info-circle"></i> 描述</th>
+                                <th><i class="fas fa-clock"></i> 默认时长(分钟)</th>
+                                <th><i class="fas fa-signal"></i> 状态</th>
+                                <th><i class="fas fa-cogs"></i> 操作</th>
                             </tr>
                         </thead>
                         <tbody id="coursesTableBody">
@@ -135,20 +241,26 @@
             <!-- 会员卡类型管理 -->
             <section id="card-types" class="section">
                 <div class="section-header">
-                    <h2>会员卡类型管理</h2>
-                    <button class="btn btn-primary" onclick="showCardTypeForm()">添加卡类型</button>
+                    <div class="section-title">
+                        <i class="fas fa-credit-card section-icon"></i>
+                        <h2>会员卡类型管理</h2>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCardTypeForm()">
+                        <i class="fas fa-plus"></i>
+                        <span>添加卡类型</span>
+                    </button>
                 </div>
                 
                 <div class="table-container">
                     <table id="cardTypesTable" class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>类型名称</th>
-                                <th>价格(元)</th>
-                                <th>有效期(天)</th>
-                                <th>描述</th>
-                                <th>操作</th>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-credit-card"></i> 类型名称</th>
+                                <th><i class="fas fa-money-bill"></i> 价格(元)</th>
+                                <th><i class="fas fa-calendar-day"></i> 有效期(天)</th>
+                                <th><i class="fas fa-info-circle"></i> 描述</th>
+                                <th><i class="fas fa-cogs"></i> 操作</th>
                             </tr>
                         </thead>
                         <tbody id="cardTypesTableBody">
@@ -160,14 +272,29 @@
             <!-- 会员详情 -->
             <section id="member-detail" class="section">
                 <div class="section-header">
-                    <h2 id="memberDetailTitle">会员详情</h2>
-                    <button class="btn" onclick="showSection('members')">返回会员列表</button>
+                    <div class="section-title">
+                        <i class="fas fa-user-circle section-icon"></i>
+                        <h2 id="memberDetailTitle">会员详情</h2>
+                    </div>
+                    <button class="btn btn-back" onclick="showSection('members')">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>返回会员列表</span>
+                    </button>
                 </div>
                 
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="showTab('member-cards')">会员卡</button>
-                    <button class="tab-btn" onclick="showTab('member-courses')">已报课程</button>
-                    <button class="tab-btn" onclick="showTab('member-trainers')">指派教练</button>
+                    <button class="tab-btn active" onclick="showTab('member-cards')">
+                        <i class="fas fa-credit-card"></i>
+                        <span>会员卡</span>
+                    </button>
+                    <button class="tab-btn" onclick="showTab('member-courses')">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>已报课程</span>
+                    </button>
+                    <button class="tab-btn" onclick="showTab('member-trainers')">
+                        <i class="fas fa-user-tie"></i>
+                        <span>指派教练</span>
+                    </button>
                 </div>
 
                 <div id="member-cards" class="tab-content active">
@@ -244,13 +371,25 @@
             <!-- 教练详情 -->
             <section id="trainer-detail" class="section">
                 <div class="section-header">
-                    <h2 id="trainerDetailTitle">教练详情</h2>
-                    <button class="btn" onclick="showSection('trainers')">返回教练列表</button>
+                    <div class="section-title">
+                        <i class="fas fa-user-tie section-icon"></i>
+                        <h2 id="trainerDetailTitle">教练详情</h2>
+                    </div>
+                    <button class="btn btn-back" onclick="showSection('trainers')">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>返回教练列表</span>
+                    </button>
                 </div>
                 
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="showTrainerTab('trainer-courses')">教学课程</button>
-                    <button class="tab-btn" onclick="showTrainerTab('trainer-members')">指派会员</button>
+                    <button class="tab-btn active" onclick="showTrainerTab('trainer-courses')">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>教学课程</span>
+                    </button>
+                    <button class="tab-btn" onclick="showTrainerTab('trainer-members')">
+                        <i class="fas fa-users"></i>
+                        <span>指派会员</span>
+                    </button>
                 </div>
 
                 <div id="trainer-courses" class="tab-content active">
@@ -305,7 +444,11 @@
     <!-- 模态框 -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
             <div id="modalBody"></div>
         </div>
     </div>
