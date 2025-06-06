@@ -1,3 +1,37 @@
+// 会员卡状态转换函数
+function getCardStatusText(status) {
+    const statusMap = {
+        'pending_activation': '待激活',
+        'active': '活跃',
+        'frozen': '冻结',
+        'expired': '过期',
+        'cancelled': '已取消'
+    };
+    return statusMap[status] || status;
+}
+
+// 课程报名状态转换函数
+function getEnrollmentStatusText(status) {
+    const statusMap = {
+        '已报名': '已报名',
+        '进行中': '进行中',
+        '已完成': '已完成',
+        '已取消': '已取消'
+    };
+    return statusMap[status] || status;
+}
+
+// 指派类型转换函数
+function getAssignmentTypeText(type) {
+    const typeMap = {
+        'personal': '私教',
+        'group': '团体课',
+        'consultation': '咨询',
+        'assessment': '体能评估'
+    };
+    return typeMap[type] || type;
+}
+
 // 加载会员卡列表
 async function loadMemberCards(memberId) {
     const tbody = document.getElementById('memberCardsTableBody');
@@ -18,7 +52,7 @@ async function loadMemberCards(memberId) {
                     <td>${formatDate(card.purchase_date)}</td>
                     <td>${formatDate(card.activation_date)}</td>
                     <td>${formatDate(card.expiry_date)}</td>
-                    <td>${card.status}</td>
+                    <td>${getCardStatusText(card.status)}</td>
                     <td>
                         <button class="btn" onclick="editMemberCard(${card.id})">编辑</button>
                         <button class="btn btn-danger" onclick="deleteMemberCard(${card.id}, '${card.card_type_name}')">删除</button>
@@ -50,7 +84,7 @@ async function loadMemberEnrollments(memberId) {
                     <td>${enrollment.id}</td>
                     <td>${enrollment.course_name}</td>
                     <td>${formatDate(enrollment.enrollment_date)}</td>
-                    <td>${enrollment.status}</td>
+                    <td>${getEnrollmentStatusText(enrollment.status)}</td>
                     <td>${enrollment.notes || ''}</td>
                     <td>
                         <button class="btn" onclick="editMemberEnrollment(${enrollment.id})">编辑</button>
@@ -83,7 +117,7 @@ async function loadMemberAssignments(memberId) {
                     <td>${assignment.id}</td>
                     <td>${assignment.trainer_name}</td>
                     <td>${formatDate(assignment.assignment_date)}</td>
-                    <td>${assignment.assignment_type || ''}</td>
+                    <td>${getAssignmentTypeText(assignment.assignment_type)}</td>
                     <td>${assignment.notes || ''}</td>
                     <td>
                         <button class="btn" onclick="editMemberAssignment(${assignment.id})">编辑</button>
@@ -146,10 +180,9 @@ async function showMemberCardForm(cardId = null) {
                 <label for="memberCardStatus">状态</label>
                 <select id="memberCardStatus">
                     <option value="pending_activation" ${card && card.status === 'pending_activation' ? 'selected' : ''}>待激活</option>
-                    <option value="active" ${card && card.status === 'active' ? 'selected' : ''}>活动</option>
+                    <option value="active" ${card && card.status === 'active' ? 'selected' : ''}>活跃</option>
                     <option value="frozen" ${card && card.status === 'frozen' ? 'selected' : ''}>冻结</option>
                     <option value="expired" ${card && card.status === 'expired' ? 'selected' : ''}>过期</option>
-                    <option value="cancelled" ${card && card.status === 'cancelled' ? 'selected' : ''}>取消</option>
                 </select>
             </div>
             <div class="form-group">

@@ -1,3 +1,13 @@
+// 会员状态转换函数
+function getMemberStatusText(status) {
+    const statusMap = {
+        'active': '活跃',
+        'inactive': '非活跃',
+        'frozen': '冻结'
+    };
+    return statusMap[status] || status;
+}
+
 // 加载会员列表
 async function loadMembers() {
     const tbody = document.getElementById('membersTableBody');
@@ -15,7 +25,7 @@ async function loadMembers() {
                 <td>${member.gender || ''}</td>
                 <td>${member.phone}</td>
                 <td>${formatDate(member.join_date)}</td>
-                <td>${member.status}</td>
+                <td>${getMemberStatusText(member.status)}</td>
                 <td>
                     <button class="btn btn-success" onclick="showMemberDetail(${member.id}, '${member.name}')">查看详情</button>
                     <button class="btn" onclick="editMember(${member.id})">编辑</button>
@@ -85,9 +95,8 @@ function showMemberForm(member = null) {
             <div class="form-group">
                 <label for="memberStatus">状态</label>
                 <select id="memberStatus">
-                    <option value="active" ${member.status === 'active' ? 'selected' : ''}>活动</option>
-                    <option value="inactive" ${member.status === 'inactive' ? 'selected' : ''}>非活动</option>
-                    <option value="frozen" ${member.status === 'frozen' ? 'selected' : ''}>冻结</option>
+                    <option value="active" ${member.status === 'active' ? 'selected' : ''}>活跃</option>
+                    <option value="inactive" ${member.status === 'inactive' ? 'selected' : ''}>非活跃</option>
                 </select>
             </div>
             ` : ''}

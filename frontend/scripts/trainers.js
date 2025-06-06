@@ -1,3 +1,12 @@
+// 教练状态转换函数
+function getTrainerStatusText(status) {
+    const statusMap = {
+        'active': '活跃',
+        'inactive': '非活跃'
+    };
+    return statusMap[status] || status;
+}
+
 // 加载教练列表
 async function loadTrainers() {
     const tbody = document.getElementById('trainersTableBody');
@@ -14,7 +23,7 @@ async function loadTrainers() {
                 <td>${trainer.name}</td>
                 <td>${trainer.specialty || ''}</td>
                 <td>${trainer.contact_info || ''}</td>
-                <td>${trainer.status}</td>
+                <td>${getTrainerStatusText(trainer.status)}</td>
                 <td>
                     <button class="btn btn-success" onclick="showTrainerDetail(${trainer.id}, '${trainer.name}')">查看详情</button>
                     <button class="btn" onclick="editTrainer(${trainer.id})">编辑</button>
@@ -53,7 +62,7 @@ async function searchTrainers() {
                     <td>${trainer.name}</td>
                     <td>${trainer.specialty || ''}</td>
                     <td>${trainer.contact_info || ''}</td>
-                    <td>${trainer.status}</td>
+                    <td>${getTrainerStatusText(trainer.status)}</td>
                     <td>
                         <button class="btn btn-success" onclick="showTrainerDetail(${trainer.id}, '${trainer.name}')">查看详情</button>
                         <button class="btn" onclick="editTrainer(${trainer.id})">编辑</button>
@@ -92,8 +101,8 @@ function showTrainerForm(trainer = null) {
             <div class="form-group">
                 <label for="trainerStatus">状态</label>
                 <select id="trainerStatus">
-                    <option value="active" ${trainer.status === 'active' ? 'selected' : ''}>活动</option>
-                    <option value="inactive" ${trainer.status === 'inactive' ? 'selected' : ''}>非活动</option>
+                    <option value="active" ${trainer.status === 'active' ? 'selected' : ''}>活跃</option>
+                    <option value="inactive" ${trainer.status === 'inactive' ? 'selected' : ''}>非活跃</option>
                 </select>
             </div>
             ` : ''}

@@ -1,3 +1,25 @@
+// 课程类型转换函数
+function getCourseTypeText(type) {
+    const typeMap = {
+        'regular': '常规课程',
+        'special': '特色课程',
+        'private': '私教课程',
+        'group': '团体课程'
+    };
+    return typeMap[type] || type;
+}
+
+// 指派类型转换函数
+function getAssignmentTypeText(type) {
+    const typeMap = {
+        'personal': '私教',
+        'group': '团体课',
+        'consultation': '咨询',
+        'assessment': '体能评估'
+    };
+    return typeMap[type] || type;
+}
+
 // 加载教练课程分配列表
 async function loadTrainerCourses(trainerId) {
     const tbody = document.getElementById('trainerCoursesTableBody');
@@ -16,7 +38,7 @@ async function loadTrainerCourses(trainerId) {
                     <td>${assignment.id}</td>
                     <td>${assignment.course_name}</td>
                     <td>${formatDate(assignment.assignment_date)}</td>
-                    <td>${assignment.course_type || ''}</td>
+                    <td>${getCourseTypeText(assignment.course_type)}</td>
                     <td>${assignment.notes || ''}</td>
                     <td>
                         <button class="btn" onclick="editTrainerCourse(${assignment.id})">编辑</button>
@@ -49,7 +71,7 @@ async function loadTrainerMembers(trainerId) {
                     <td>${assignment.id}</td>
                     <td>${assignment.member_name}</td>
                     <td>${formatDate(assignment.assignment_date)}</td>
-                    <td>${assignment.assignment_type || ''}</td>
+                    <td>${getAssignmentTypeText(assignment.assignment_type)}</td>
                     <td>${assignment.notes || ''}</td>
                     <td>
                         <button class="btn" onclick="editTrainerMember(${assignment.id})">编辑</button>

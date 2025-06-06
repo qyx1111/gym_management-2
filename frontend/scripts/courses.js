@@ -1,3 +1,12 @@
+// 课程状态转换函数
+function getCourseStatusText(status) {
+    const statusMap = {
+        'active': '活跃',
+        'inactive': '非活跃'
+    };
+    return statusMap[status] || status;
+}
+
 // 加载课程列表
 async function loadCourses() {
     const tbody = document.getElementById('coursesTableBody');
@@ -14,7 +23,7 @@ async function loadCourses() {
                 <td>${course.name}</td>
                 <td>${course.description || ''}</td>
                 <td>${course.default_duration_minutes || ''}</td>
-                <td>${course.status}</td>
+                <td>${getCourseStatusText(course.status)}</td>
                 <td>
                     <button class="btn" onclick="editCourse(${course.id})">编辑</button>
                     <button class="btn btn-danger" onclick="deleteCourse(${course.id}, '${course.name}')">删除</button>
@@ -51,8 +60,8 @@ function showCourseForm(course = null) {
             <div class="form-group">
                 <label for="courseStatus">状态</label>
                 <select id="courseStatus">
-                    <option value="active" ${course.status === 'active' ? 'selected' : ''}>活动</option>
-                    <option value="inactive" ${course.status === 'inactive' ? 'selected' : ''}>非活动</option>
+                    <option value="active" ${course.status === 'active' ? 'selected' : ''}>活跃</option>
+                    <option value="inactive" ${course.status === 'inactive' ? 'selected' : ''}>非活跃</option>
                 </select>
             </div>
             ` : ''}
