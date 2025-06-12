@@ -51,7 +51,8 @@
             <!-- 首页仪表板 -->
             <section id="dashboard" class="section active">
                 <div class="welcome-banner">
-                    <h2><i class="fas fa-chart-line"></i> 欢迎使用健身房会员管理系统</h2>
+                    <img src="assets/nuaa.png" alt="NUAA Logo" class="welcome-image">
+                    <h2><i class="fas fa-chart-line"></i> 欢迎使用NUAA健身房会员管理系统</h2>
                     <p>高效管理您的健身房业务</p>
                 </div>
                 <div class="dashboard-cards">
@@ -220,6 +221,17 @@
                     </button>
                 </div>
                 
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="courseSearch" placeholder="搜索课程名称或描述..." onkeyup="searchCourses()">
+                    </div>
+                    <button class="btn btn-refresh" onclick="loadCourses()">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新</span>
+                    </button>
+                </div>
+                
                 <div class="table-container">
                     <table id="coursesTable" class="table">
                         <thead>
@@ -248,6 +260,17 @@
                     <button class="btn btn-primary" onclick="showCardTypeForm()">
                         <i class="fas fa-plus"></i>
                         <span>添加卡类型</span>
+                    </button>
+                </div>
+                
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="cardTypeSearch" placeholder="搜索卡类型名称或描述..." onkeyup="searchCardTypes()">
+                    </div>
+                    <button class="btn btn-refresh" onclick="loadCardTypes()">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新</span>
                     </button>
                 </div>
                 

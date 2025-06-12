@@ -36,6 +36,45 @@ async function loadCourses() {
     }
 }
 
+// 搜索课程
+async function searchCourses() {
+    const searchTerm = document.getElementById('courseSearch').value.trim();
+    if (!searchTerm) {
+        loadCourses();
+        return;
+    }
+    
+    const tbody = document.getElementById('coursesTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">搜索中...</td></tr>';
+    
+    const response = await api.searchCourses(searchTerm);
+    
+    if (response.success) {
+        tbody.innerHTML = '';
+        if (response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">未找到匹配的课程</td></tr>';
+        } else {
+            response.data.forEach(course => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${course.id}</td>
+                    <td>${course.name}</td>
+                    <td>${course.description || ''}</td>
+                    <td>${course.default_duration_minutes || ''}</td>
+                    <td>${getCourseStatusText(course.status)}</td>
+                    <td>
+                        <button class="btn" onclick="editCourse(${course.id})">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteCourse(${course.id}, '${course.name}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } else {
+        tbody.innerHTML = `<tr><td colspan="6">搜索失败: ${response.message}</td></tr>`;
+    }
+}
+
 // 显示课程表单
 function showCourseForm(course = null) {
     currentEditingItem = course;

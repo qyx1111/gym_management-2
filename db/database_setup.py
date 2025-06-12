@@ -4,6 +4,14 @@ import os
 DATABASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_NAME = os.path.join(DATABASE_DIR, 'gym_management.db')
 
+def drop_database():
+    """删除整个数据库文件"""
+    if os.path.exists(DATABASE_NAME):
+        os.remove(DATABASE_NAME)
+        print("数据库已删除。")
+    else:
+        print("数据库文件不存在。")
+
 def create_connection():
     """创建数据库连接到SQLite数据库"""
     conn = None
@@ -46,7 +54,7 @@ def create_tables():
                     description TEXT
                 );
             """)
-            # 会员卡实例表 (会员拥有的卡) - 这是“会员与会员卡的关系表”
+            # 会员卡实例表 (会员拥有的卡) - 这是"会员与会员卡的关系表"
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS member_cards (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,8 +65,8 @@ def create_tables():
                     expiry_date TEXT NOT NULL,
                     status TEXT DEFAULT 'pending_activation', -- e.g., pending_activation, active, frozen, expired, cancelled
                     notes TEXT,
-                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
-                    FOREIGN KEY (card_type_id) REFERENCES membership_card_types (id) ON DELETE RESTRICT
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    FOREIGN KEY (card_type_id) REFERENCES membership_card_types (id) ON DELETE CASCADE ON UPDATE CASCADE
                 );
             """)
             # 课程表
@@ -91,8 +99,8 @@ def create_tables():
                     enrollment_date TEXT NOT NULL,
                     status TEXT DEFAULT 'enrolled', -- e.g., enrolled, completed, dropped
                     notes TEXT,
-                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
-                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE 
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE ON UPDATE CASCADE
                 );
             """)
 
@@ -105,8 +113,8 @@ def create_tables():
                     assignment_date TEXT NOT NULL,
                     assignment_type TEXT, -- e.g., personal_training_package, consultation
                     notes TEXT,
-                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
-                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE
+                    FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE ON UPDATE CASCADE
                 );
             """)
 
@@ -119,8 +127,8 @@ def create_tables():
                     assignment_date TEXT NOT NULL,
                     course_type TEXT, -- e.g., regular, special, private, group
                     notes TEXT,
-                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE,
-                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+                    FOREIGN KEY (trainer_id) REFERENCES trainers (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE ON UPDATE CASCADE
                 );
             """)
             

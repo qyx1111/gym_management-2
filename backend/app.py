@@ -28,6 +28,7 @@ def init_database():
     """初始化数据库"""
     try:
         print("正在初始化数据库...")
+        #database_setup.drop_database()  # 删除旧的数据库文件
         database_setup.create_tables()
         print("数据库初始化完成。")
     except Exception as e:
@@ -105,8 +106,15 @@ def update_member(member_id):
     """更新会员信息"""
     data = request.json
     success, message = db_ops.update_member(
-        member_id, data['name'], data['gender'], data['birth_date'], data['phone'],
-        data['emergency_contact_name'], data['emergency_contact_phone'], data['health_notes'], data['status']
+        member_id, 
+        data['name'], 
+        data.get('gender', ''), 
+        data.get('birth_date', ''), 
+        data['phone'],
+        data.get('emergency_contact_name', ''),  # 提供默认值
+        data.get('emergency_contact_phone', ''), # 提供默认值
+        data.get('health_notes', ''), 
+        data['status']
     )
     return jsonify({'success': success, 'message': message})
 
@@ -198,6 +206,28 @@ def delete_course(course_id):
     success, message = db_ops.delete_course_logically(course_id)
     return jsonify({'success': success, 'message': message})
 
+@app.route('/api/courses/search', methods=['GET'])
+@handle_api_errors
+def search_courses():
+    """搜索课程"""
+    search_term = request.args.get('term', '')
+    courses = db_ops.search_courses(search_term)
+    return jsonify({
+        'success': True,
+        'data': [dict(zip(['id', 'name', 'description', 'default_duration_minutes', 'status'], course)) for course in courses]
+    })
+
+@app.route('/api/members/search', methods=['GET'])
+@handle_api_errors
+def search_members():
+    """搜索会员"""
+    search_term = request.args.get('term', '')
+    members = db_ops.search_members(search_term)
+    return jsonify({
+        'success': True,
+        'data': [dict(zip(['id', 'name', 'gender', 'birth_date', 'phone', 'emergency_contact_name', 'emergency_contact_phone', 'health_notes', 'join_date', 'status'], member)) for member in members]
+    })
+
 # 会员卡类型管理API
 @app.route('/api/card-types', methods=['GET'])
 @handle_api_errors
@@ -231,6 +261,17 @@ def delete_card_type(card_type_id):
     """删除会员卡类型"""
     success, message = db_ops.delete_card_type(card_type_id)
     return jsonify({'success': success, 'message': message})
+
+@app.route('/api/card-types/search', methods=['GET'])
+@handle_api_errors
+def search_card_types():
+    """搜索会员卡类型"""
+    search_term = request.args.get('term', '')
+    card_types = db_ops.search_card_types(search_term)
+    return jsonify({
+        'success': True,
+        'data': [dict(zip(['id', 'name', 'price', 'duration_days', 'description'], card_type)) for card_type in card_types]
+    })
 
 # 会员详细信息API
 @app.route('/api/members/<int:member_id>/cards', methods=['GET'])

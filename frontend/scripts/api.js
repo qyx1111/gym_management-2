@@ -30,6 +30,10 @@ class ApiClient {
         return this.request(`/members/${id}`);
     }
 
+    async searchMembers(term) {
+        return this.request(`/members/search?term=${encodeURIComponent(term)}`);
+    }
+
     async createMember(memberData) {
         return this.request('/members', {
             method: 'POST',
@@ -84,6 +88,10 @@ class ApiClient {
         return this.request(`/courses?active_only=${activeOnly}`);
     }
 
+    async searchCourses(term) {
+        return this.request(`/courses/search?term=${encodeURIComponent(term)}`);
+    }
+
     async createCourse(courseData) {
         return this.request('/courses', {
             method: 'POST',
@@ -107,6 +115,10 @@ class ApiClient {
     // 会员卡类型API
     async getCardTypes() {
         return this.request('/card-types');
+    }
+
+    async searchCardTypes(term) {
+        return this.request(`/card-types/search?term=${encodeURIComponent(term)}`);
     }
 
     async createCardType(cardTypeData) {

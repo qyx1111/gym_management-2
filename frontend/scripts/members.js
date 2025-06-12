@@ -40,14 +40,44 @@ async function loadMembers() {
 }
 
 // 搜索会员
-function searchMembers() {
-    const searchTerm = document.getElementById('memberSearch').value.toLowerCase();
-    const rows = document.querySelectorAll('#membersTableBody tr');
+async function searchMembers() {
+    const searchTerm = document.getElementById('memberSearch').value.trim();
+    if (!searchTerm) {
+        loadMembers();
+        return;
+    }
     
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
+    const tbody = document.getElementById('membersTableBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">搜索中...</td></tr>';
+    
+    const response = await api.searchMembers(searchTerm);
+    
+    if (response.success) {
+        tbody.innerHTML = '';
+        if (response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">未找到匹配的会员</td></tr>';
+        } else {
+            response.data.forEach(member => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${member.id}</td>
+                    <td>${member.name}</td>
+                    <td>${member.gender || ''}</td>
+                    <td>${member.phone}</td>
+                    <td>${formatDate(member.join_date)}</td>
+                    <td>${getMemberStatusText(member.status)}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="showMemberDetail(${member.id}, '${member.name}')">查看详情</button>
+                        <button class="btn" onclick="editMember(${member.id})">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteMember(${member.id}, '${member.name}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } else {
+        tbody.innerHTML = `<tr><td colspan="7">搜索失败: ${response.message}</td></tr>`;
+    }
 }
 
 // 显示会员表单
@@ -109,7 +139,10 @@ async function saveMember() {
         gender: document.getElementById('memberGender').value,
         birth_date: document.getElementById('memberBirthDate').value,
         phone: document.getElementById('memberPhone').value.trim(),
-        health_notes: document.getElementById('memberHealthNotes').value.trim()
+        health_notes: document.getElementById('memberHealthNotes').value.trim(),
+        // 为兼容后端，提供空字符串默认值
+        emergency_contact_name: '',
+        emergency_contact_phone: ''
     };
     
     if (currentEditingItem) {

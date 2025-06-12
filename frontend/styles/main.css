@@ -56,6 +56,17 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.nuaa-logo {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255,255,255,0.8);
+}
+
 /* 头部样式 */
 .header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -225,6 +236,23 @@ body {
     border: 1px solid var(--gray-200);
 }
 
+.welcome-image {
+    width: 120px;
+    height: 120px;
+    box-shadow: var(--shadow-md);
+    object-fit: cover;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    background: var(--white);
+    flex-shrink: 0;
+}
+
+.welcome-image:hover {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--secondary-color);
+}
+
 .welcome-banner h2 {
     color: var(--gray-800);
     font-size: 2rem;
@@ -244,6 +272,7 @@ body {
 .welcome-banner p {
     color: var(--gray-600);
     font-size: 1.1rem;
+    text-align: center;
 }
 
 .section-header {
@@ -1012,6 +1041,12 @@ body {
     .btn {
         padding: 0.75rem 1.25rem;
         justify-content: center;
+    }
+
+    .welcome-image {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
     }
 }
 

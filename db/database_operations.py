@@ -41,25 +41,26 @@ def get_all_members():
         conn.close()
 
 def search_members(search_term):
-    """根据姓名或电话搜索会员"""
+    """搜索会员"""
     conn = create_connection()
-    if not conn:
-        return []
+    cursor = conn.cursor()
+    
     try:
-        cursor = conn.cursor()
-        query = """
-            SELECT id, name, gender, birth_date, phone, emergency_contact_name, 
-                   emergency_contact_phone, health_notes, join_date, status 
-            FROM members 
-            WHERE name LIKE ? OR phone LIKE ?
-            ORDER BY id DESC
-        """
-        like_term = f"%{search_term}%"
-        cursor.execute(query, (like_term, like_term))
+        # 搜索会员姓名、电话号码等字段
+        query = '''
+        SELECT id, name, gender, birth_date, phone, emergency_contact_name, 
+               emergency_contact_phone, health_notes, join_date, status
+        FROM members 
+        WHERE status != 'deleted' 
+        AND (name LIKE ? OR phone LIKE ? OR COALESCE(emergency_contact_name, '') LIKE ?)
+        ORDER BY name
+        '''
+        search_pattern = f'%{search_term}%'
+        cursor.execute(query, (search_pattern, search_pattern, search_pattern))
         members = cursor.fetchall()
         return members
-    except sqlite3.Error as e:
-        print(f"搜索会员时发生错误: {e}")
+    except Exception as e:
+        print(f"搜索会员时出错: {e}")
         return []
     finally:
         conn.close()
@@ -171,24 +172,24 @@ def get_all_card_types():
         conn.close()
 
 def search_card_types(search_term):
-    """根据名称搜索会员卡类型"""
+    """搜索会员卡类型"""
     conn = create_connection()
-    if not conn:
-        return []
+    cursor = conn.cursor()
+    
     try:
-        cursor = conn.cursor()
-        query = """
-            SELECT id, name, price, duration_days, description 
-            FROM membership_card_types
-            WHERE name LIKE ?
-            ORDER BY id DESC
-        """
-        like_term = f"%{search_term}%"
-        cursor.execute(query, (like_term,))
+        # 搜索卡类型名称和描述
+        query = '''
+        SELECT id, name, price, duration_days, description
+        FROM membership_card_types 
+        WHERE name LIKE ? OR COALESCE(description, '') LIKE ?
+        ORDER BY name
+        '''
+        search_pattern = f'%{search_term}%'
+        cursor.execute(query, (search_pattern, search_pattern))
         card_types = cursor.fetchall()
         return card_types
-    except sqlite3.Error as e:
-        print(f"搜索会员卡类型时发生错误: {e}")
+    except Exception as e:
+        print(f"搜索会员卡类型时出错: {e}")
         return []
     finally:
         conn.close()
@@ -308,7 +309,7 @@ def search_trainers(search_term):
         query = """
             SELECT id, name, specialty, contact_info, status 
             FROM trainers 
-            WHERE (name LIKE ? OR specialty LIKE ?) AND status = 'active'
+            WHERE (name LIKE ? OR specialty LIKE ?)
             ORDER BY name
         """
         # 使用 % 通配符进行模糊匹配
@@ -426,24 +427,25 @@ def get_all_courses(active_only=False): # Modified to accept active_only flag
         conn.close()
 
 def search_courses(search_term):
-    """根据名称搜索课程"""
+    """搜索课程"""
     conn = create_connection()
-    if not conn:
-        return []
+    cursor = conn.cursor()
+    
     try:
-        cursor = conn.cursor()
-        query = """
-            SELECT id, name, description, default_duration_minutes, status 
-            FROM courses
-            WHERE name LIKE ?
-            ORDER BY id DESC
-        """
-        like_term = f"%{search_term}%"
-        cursor.execute(query, (like_term,))
+        # 搜索课程名称和描述
+        query = '''
+        SELECT id, name, description, default_duration_minutes, status
+        FROM courses 
+        WHERE status != 'deleted' 
+        AND (name LIKE ? OR COALESCE(description, '') LIKE ?)
+        ORDER BY name
+        '''
+        search_pattern = f'%{search_term}%'
+        cursor.execute(query, (search_pattern, search_pattern))
         courses = cursor.fetchall()
         return courses
-    except sqlite3.Error as e:
-        print(f"搜索课程时发生错误: {e}")
+    except Exception as e:
+        print(f"搜索课程时出错: {e}")
         return []
     finally:
         conn.close()

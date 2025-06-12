@@ -128,3 +128,42 @@ async function deleteCardType(id, name) {
         }
     });
 }
+
+// 搜索会员卡类型
+async function searchCardTypes() {
+    const searchTerm = document.getElementById('cardTypeSearch').value.trim();
+    if (!searchTerm) {
+        loadCardTypes();
+        return;
+    }
+    
+    const tbody = document.getElementById('cardTypesTableBody');
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">搜索中...</td></tr>';
+    
+    const response = await api.searchCardTypes(searchTerm);
+    
+    if (response.success) {
+        tbody.innerHTML = '';
+        if (response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">未找到匹配的会员卡类型</td></tr>';
+        } else {
+            response.data.forEach(cardType => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cardType.id}</td>
+                    <td>${cardType.name}</td>
+                    <td>¥${cardType.price}</td>
+                    <td>${cardType.duration_days}</td>
+                    <td>${cardType.description || ''}</td>
+                    <td>
+                        <button class="btn" onclick="editCardType(${cardType.id})">编辑</button>
+                        <button class="btn btn-danger" onclick="deleteCardType(${cardType.id}, '${cardType.name}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } else {
+        tbody.innerHTML = `<tr><td colspan="6">搜索失败: ${response.message}</td></tr>`;
+    }
+}
