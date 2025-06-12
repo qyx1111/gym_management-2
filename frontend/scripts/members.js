@@ -80,14 +80,6 @@ function showMemberForm(member = null) {
                 <input type="tel" id="memberPhone" value="${member ? member.phone : ''}" required>
             </div>
             <div class="form-group">
-                <label for="memberEmergencyName">紧急联系人</label>
-                <input type="text" id="memberEmergencyName" value="${member ? member.emergency_contact_name || '' : ''}">
-            </div>
-            <div class="form-group">
-                <label for="memberEmergencyPhone">紧急联系电话</label>
-                <input type="tel" id="memberEmergencyPhone" value="${member ? member.emergency_contact_phone || '' : ''}">
-            </div>
-            <div class="form-group">
                 <label for="memberHealthNotes">健康备注</label>
                 <textarea id="memberHealthNotes">${member ? member.health_notes || '' : ''}</textarea>
             </div>
@@ -117,8 +109,6 @@ async function saveMember() {
         gender: document.getElementById('memberGender').value,
         birth_date: document.getElementById('memberBirthDate').value,
         phone: document.getElementById('memberPhone').value.trim(),
-        emergency_contact_name: document.getElementById('memberEmergencyName').value.trim(),
-        emergency_contact_phone: document.getElementById('memberEmergencyPhone').value.trim(),
         health_notes: document.getElementById('memberHealthNotes').value.trim()
     };
     
