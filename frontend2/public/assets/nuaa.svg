@@ -1,0 +1,6 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="55" fill="#667eea" stroke="#5a67d8" stroke-width="2"/>
+  <text x="60" y="45" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">NUAA</text>
+  <text x="60" y="65" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="10">健身房</text>
+  <text x="60" y="80" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="10">管理系统</text>
+</svg>

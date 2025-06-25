@@ -3440,3 +3440,606 @@ header h1 {
 🛠️ **问题解决能力**：在开发过程中遇到了外键约束、并发访问、数据一致性等问题，通过查阅资料和实践解决，提升了独立解决问题的能力。
 
 👥 **团队协作意识**：虽然是个人项目，但在设计API接口、编写文档时，培养了团队协作的意识和规范化开发的习惯。
+
+第
+
+## **实验三: Navicat 查询分析器**
+
+1.  **实验目的:**
+    *   了解 Navicat 查询分析器的启动。
+    *   熟悉如何在 Navicat 查询分析器中建表、插入记录、查询记录。
+    *   学会 Navicat 查询分析器的基本使用。
+
+2.  **实验内容与步骤:**
+    
+    1.  启动查询分析器：通过程序菜单启动“查询分析器”，连接到 SQL Server 实例。
+    2.  选择数据库：使用 `USE [数据库名]` 命令或通过查询分析器工具栏选择目标数据库。
+    3.  执行 SQL 语句：在查询窗口中编写 SQL 语句（如建表、插入数据、查询数据），并执行。
+    4.  查看结果：在结果窗格中查看 SQL 语句的执行结果或消息。
+    
+4.  **实验任务与结果:**
+    1.  **任务1:** 用 SQL 语言建表 student，表结构如下图所示:
+        
+        | 字段名   | 类型    | 长度 | 含义     |
+        | :------- | :------ | :--- | :------- |
+        | id       | varchar | 17   | 学生编号 |
+        | name     | varchar | 10   | 姓名     |
+        | sex      | varchar | 2    | 性别     |
+        | age      | integer |      | 年龄     |
+        | score    | numeric | 6,2  | 总成绩   |
+        | Joindate | date    |      | 入学日期 |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE student (
+                id VARCHAR(17) PRIMARY KEY,
+                name VARCHAR(10),
+                sex VARCHAR(2),
+                age INTEGER,
+                score NUMERIC(6,2),
+                Joindate DATE
+            );
+            ```
+        *   **结果:** 表 student 创建成功。
+            
+            *   ![image-20250525122745086](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525122745086.png)
+    2.  **任务2:** 用 SQL 语言向表 student 插入如下 6 条记录:
+        | id    | name | sex  | age  | score  | Joindate   |
+        | :---- | :--- | :--- | :--- | :----- | :--------- |
+        | A0001 | 赵一 | 男   | 20   | 580.00 | 2020-09-01 |
+        | B0002 | 钱二 | 女   | 19   | 540.00 | 2021-09-01 |
+        | C0003 | 孙三 | 男   | 21   | 555.50 | 2020-08-30 |
+        | D0004 | 李四 | 男   | 22   | 480.00 | 2021-09-02 |
+        | E0005 | 周五 | 女   | 20   | 495.50 | 2022-07-30 |
+        | F0006 | 吴六 | 男   | 19   | 435.00 | 2021-09-01 |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO student (id, name, sex, age, score, Joindate) VALUES
+            ('A0001', '赵一', '男', 20, 580.00, '2020-09-01'),
+            ('B0002', '钱二', '女', 19, 540.00, '2021-09-01'),
+            ('C0003', '孙三', '男', 21, 555.50, '2020-08-30'),
+            ('D0004', '李四', '男', 22, 480.00, '2021-09-02'),
+            ('E0005', '周五', '女', 20, 495.50, '2022-07-30'),
+            ('F0006', '吴六', '男', 19, 435.00, '2021-09-01');
+            ```
+        *   **结果:** 6 条记录成功插入到 student 表。
+            *   ![image-20250525122808778](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525122808778.png)
+    3.  **任务3:** 练习查询语句，查找年龄大于等于 20 岁，成绩低于 500 分的记录。
+        *   **SQL 语句:**
+            ```sql
+            SELECT * FROM student
+            WHERE age >= 20 AND score < 500;
+            ```
+        *   **结果:**
+            
+            *   ![image-20250525122834185](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525122834185.png)
+    4.  **任务4:** 统计各年级学生人数，输出为：入学年级 人数
+        
+        *   **SQL 语句:**
+            ```sql
+            SELECT YEAR(Joindate) AS 入学年级, COUNT(*) AS 人数
+            FROM student
+            GROUP BY YEAR(Joindate);
+            ```
+        *   **结果:**
+            *   ![image-20250525122919629](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525122919629.png)
+    
+5.  **实验小结:**
+    本次实验熟悉了 Navicat 查询分析器的使用，包括连接数据库、执行 SQL 语句（DDL 和 DML），以及查看结果。掌握了使用 SQL 语言进行表的创建、数据插入和基本查询。
+
+---
+
+## **实验四: SQL 语言的 DDL**
+
+1.  **实验目的:**
+    *   了解 DDL 语言的 CREATE、DROP、ALTER 对表、索引、视图的操作。
+    *   学会 SQL Server 2000 的查询分析器中用 DDL 语言进行对表、索引、视图的增加、删除和改动。
+
+3.  **实验任务与结果:**
+    (所有 SQL 语句在查询分析器中执行，默认在之前创建的 Demo 或 Test 数据库下操作)
+    
+    1.  **任务1:** 用 Create Table 建表 aa，表结构如下所示:
+        
+        | 字段名 | 类型    | 长度 | 含义  |
+        | :----- | :------ | :--- | :---- |
+        | Aa1    | Varchar | 20   | 字段1 |
+        | Aa2    | Int     |      | 字段2 |
+        | Aa3    | Dec     | 10,2 | 字段3 |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE aa (
+                Aa1 VARCHAR(20), 
+                Aa2 INT,
+                Aa3 DECIMAL(10,2)
+            );
+            ```
+        *   **结果:**![image-20250525123032172](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525123032172.png)
+        
+    2.  **任务2:** 用 Create Table 建表 bb，表结构如下所示:
+        | 字段名 | 类型    | 长度 | 含义  |
+        | :----- | :------ | :--- | :---- |
+        | Bb1    | Varchar | 30   | 字段1 |
+        | Bb2    | Int     |      | 字段2 |
+        | Bb3    | Dec     | 6,2  | 字段3 |
+        *   **SQL 语句:**
+            
+            ```sql
+            CREATE TABLE bb (
+                Bb1 VARCHAR(30),
+                Bb2 INT,
+                Bb3 DECIMAL(6,2)
+            );
+            ```
+        *   **结果:** ![image-20250525123050288](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525123050288.png)
+        
+    3.  **任务3:** 用 Drop Table 删除表 aa。
+        *   **SQL 语句:** `DROP TABLE aa;`
+        *   **结果:** ![image-20250525123108267](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525123108267.png)
+        
+    4.  **任务4:** 用 Alter Table 修改表 bb，添加一个字段 Bb4，类型 Varchar，长度 20。
+        *   **SQL 语句:** `ALTER TABLE bb ADD Bb4 VARCHAR(20);`
+        *   **结果:** ![image-20250525123126657](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525123126657.png)
+        
+    5.  **任务5:** 用 Create View 对表 Bb 的 Bb1 和 Bb4 建立一个视图 Viewbb，字段名为 Viewbb1 和 Viewbb2。
+        *   **SQL 语句:**
+            
+            ```sql
+            CREATE VIEW Viewbb (Viewbb1, Viewbb2)
+            AS
+            SELECT Bb1, Bb4 FROM bb;
+            ```
+        *   **结果:** ![image-20250525123144508](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525123144508.png)
+        
+    6.  **任务6:** Drop View 删除视图 Viewbb。
+        
+        *   **SQL 语句:** `DROP VIEW Viewbb;`
+        *   **结果:** ![QQ20250521-195020](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195020.png)
+        
+    7.  **任务7:** 用 Create Index 对表 Bb 的 Bb3 字段建立一个升序索引，索引名 Indexbb。
+        *   **SQL 语句:** `CREATE INDEX Indexbb ON bb (Bb3 ASC);`
+        *   **结果:** ![QQ20250521-195055](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195055.png)
+        
+    8.  **任务8:** 用 Drop Index 删除索引 Indexbb。
+        *   **SQL 语句:** `DROP INDEX bb.Indexbb;`
+        *   **结果:** ![QQ20250521-195328](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195328.png)
+    
+4.  **实验小结:**
+    通过本次实验，掌握了使用 DDL 语句对数据库对象（表、视图、索引）进行创建、修改和删除的基本操作。
+
+---
+
+## **实验五: SQL 语言的 DML 初步**
+
+1.  **实验目的:**
+    *   了解 DML 语言的 INSERT、UPDATE、DELETE 对数据的操作。
+    *   学会 Navicat 的查询分析器中用 DML 语言对表中的数据进行插入、删除和修改。
+
+3.  **实验任务与结果:**
+    1.  **任务1:** 打开数据库 Navicat 的查询分析器，用 Create Table 建表 cc，表结构如下所示:
+        
+        | 字段名 | 类型    | 长度 | 含义  |
+        | :----- | :------ | :--- | :---- |
+        | Cc1    | Varchar | 20   | 字段1 |
+        | Cc2    | Int     |      | 字段2 |
+        | Cc3    | Dec     | 10,2 | 字段3 |
+        | Cc4    | Varchar | 60   | 字段4 |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE cc (
+                Cc1 VARCHAR(20),
+                Cc2 INT,
+                Cc3 DECIMAL(10,2),
+                Cc4 VARCHAR(60)
+            );
+            ```
+        *   **结果:** ![QQ20250521-195546](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195546.png)
+        
+    2.  **任务2:** 用 INSERT 语句对表 cc 插入 6 条记录:
+        | Cc1  | Cc2  | Cc3    | Cc4              |
+        | :--- | :--- | :----- | :--------------- |
+        | 赵一 | 20   | 580.00 | 重邮宿舍 12-3-5  |
+        | 钱二 | 19   | 540.00 | 南福苑 5-2-9     |
+        | 孙三 | 21   | 555.50 | 学生新区 21-5-15 |
+        | 李四 | 22   | 480.00 | 重邮宿舍 8-2-22  |
+        | 周五 | 20   | 495.50 | 学生新区 23-4-8  |
+        | 吴六 | 19   | 435.00 | 南福苑 2-5-12    |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO cc (Cc1, Cc2, Cc3, Cc4) VALUES
+            ('赵一', 20, 580.00, '重邮宿舍 12-3-5'),
+            ('钱二', 19, 540.00, '南福苑 5-2-9'),
+            ('孙三', 21, 555.50, '学生新区 21-5-15'),
+            ('李四', 22, 480.00, '重邮宿舍 8-2-22'),
+            ('周五', 20, 495.50, '学生新区 23-4-8'),
+            ('吴六', 19, 435.00, '南福苑 2-5-12');
+            ```
+        *   **结果:** ![QQ20250521-195546](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195546.png)
+        
+    3.  **任务3:** 用 UPDATE 语句，将表 cc 中 cc2 小于等于 20 的记录，把 cc3 字段加 5。
+        *   **SQL 语句:** `UPDATE cc SET Cc3 = Cc3 + 5 WHERE Cc2 <= 20;`
+        *   **结果:** ![QQ20250521-195704](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195704.png)
+        
+    4.  **任务4:** 用 DELETE 语句将表 cc 中 cc2 大于等于 20 并且 cc3 大于等于 500 的记录删除。
+        *   **SQL 语句:** `DELETE FROM cc WHERE Cc2 >= 20 AND Cc3 >= 500;`
+        *   **结果:**![QQ20250521-195828](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-195828.png)
+    
+4.  **实验小结:**
+    本次实验掌握了 DML 语言中 INSERT, UPDATE, DELETE 语句的基本用法，能够对表中的数据进行有效的增、删、改操作。
+
+---
+
+## **实验六: DML 的数据查询**
+
+1.  **实验目的:**
+    *   了解 DML 语言的 SELECT 语句对数据的查询。
+    *   学会 Navica 的查询分析器中用 DML 语言对表中的数据进行简单查询、连接查询、嵌套查询和组合查询。
+
+3.  **实验任务与结果:**
+    1.  **任务1:** 建表 Student:
+        | 字段名     | 类型    | 长度 | 含义   |
+        | :--------- | :------ | :--- | :----- |
+        | ID         | Varchar | 20   | 学号   |
+        | Name       | Varchar | 10   | 姓名   |
+        | Age        | Int     |      | 年龄   |
+        | Department | Varchar | 30   | 所在系 |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE Student (
+                ID VARCHAR(20) PRIMARY KEY,
+                Name VARCHAR(10),
+                Age INT,
+                Department VARCHAR(30)
+            );
+            ```
+        *   **结果:** ![QQ20250521-201229](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-201229.png)
+    2.  **任务2:** 建表 Course:
+        | 字段名       | 类型    | 长度 | 含义   |
+        | :----------- | :------ | :--- | :----- |
+        | CourseID     | Varchar | 15   | 课程号 |
+        | CourseName   | Varchar | 30   | 课程名 |
+        | CourseBefore | Varchar | 15   | 先行课 |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE Course (
+                CourseID VARCHAR(15) PRIMARY KEY,
+                CourseName VARCHAR(30),
+                CourseBefore VARCHAR(15)
+            );
+            ```
+        *   **结果:** ![QQ20250521-201229](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-201229.png)
+    3.  **任务3:** 建表 Choose:
+        | 字段名   | 类型    | 长度 | 含义   |
+        | :------- | :------ | :--- | :----- |
+        | ID       | Varchar | 20   | 学号   |
+        | CourseID | Varchar | 30   | 课程号 |
+        | Score    | Dec     | 5,2  | 成绩   |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE Choose (
+                ID VARCHAR(20),
+                CourseID VARCHAR(30), -- 指导书写30，但Course表CourseID是15，应保持一致
+                Score DECIMAL(5,2),
+                PRIMARY KEY (ID, CourseID),
+                FOREIGN KEY (ID) REFERENCES Student(ID),
+                FOREIGN KEY (CourseID) REFERENCES Course(CourseID) -- 确保CourseID类型一致
+            );
+            ```
+        *   **结果:** ![QQ20250521-201229](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-201229.png)
+    4.  **任务4:** 向表 Student 中插入 3 条记录:
+        | ID    | Name | Age  | Department |
+        | :---- | :--- | :--- | :--------- |
+        | 00001 | 张三 | 20   | 计算机系   |
+        | 00002 | 李四 | 19   | 计算机系   |
+        | 00003 | 王五 | 21   | 计算机系   |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO Student (ID, Name, Age, Department) VALUES
+            ('00001', '张三', 20, '计算机系'),
+            ('00002', '李四', 19, '计算机系'),
+            ('00003', '王五', 21, '计算机系');
+            ```
+        *   **结果:** ![QQ20250521-202630](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-202630.png)
+    5.  **任务5:** 向表 Course 中插入 3 条记录:
+        | CourseID | CourseName  | CourseBefore |
+        | :------- | :---------- | :----------- |
+        | C1       | 计算机引论  |              |
+        | C2       | PASCAL 语言 | C1           |
+        | C3       | 数据结构    | C2           |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO Course (CourseID, CourseName, CourseBefore) VALUES
+            ('C1', '计算机引论', NULL),
+            ('C2', 'PASCAL 语言', 'C1'),
+            ('C3', '数据结构', 'C2');
+            ```
+        *   **结果:** ![QQ20250521-202706](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-202706.png)
+    6.  **任务6:** 向表 Choose 中插入 7 条记录:
+        | ID    | CourseID | Score |
+        | :---- | :------- | :---- |
+        | 00001 | C1       | 95    |
+        | 00001 | C2       | 80    |
+        | 00001 | C3       | 84    |
+        | 00002 | C1       | 80    |
+        | 00002 | C2       | 85    |
+        | 00003 | C1       | 78    |
+        | 00003 | C3       | 70    |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO Choose (ID, CourseID, Score) VALUES
+            ('00001', 'C1', 95), ('00001', 'C2', 80), ('00001', 'C3', 84),
+            ('00002', 'C1', 80), ('00002', 'C2', 85),
+            ('00003', 'C1', 78), ('00003', 'C3', 70);
+            ```
+        *   **结果:** ![QQ20250521-202805](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-202805.png)
+    7.  **任务7:** 用 SELECT 语句求计算机系学生的学号和姓名。
+        
+        *   **SQL 语句:** `SELECT ID, Name FROM Student WHERE Department = '计算机系';`
+        *   **结果:** ![QQ20250521-202848](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-202848.png)
+    8.  **任务8:** 用 SELECT 语句求学生的学号、姓名、选的课程名及成绩。
+        *   **SQL 语句:**
+            ```sql
+            SELECT S.ID, S.Name, Crs.CourseName, Ch.Score
+            FROM Student S
+            JOIN Choose Ch ON S.ID = Ch.ID
+            JOIN Course Crs ON Ch.CourseID = Crs.CourseID;
+            ```
+        *   **结果:** ![QQ20250521-202934](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-202934.png)
+    9.  **任务9:** 用 SELECT 语句求 C1 课程的成绩低于张三的学生的学号和成绩。
+        *   **SQL 语句:**
+            ```sql
+            SELECT Ch.ID, Ch.Score
+            FROM Choose Ch
+            WHERE Ch.CourseID = 'C1' AND Ch.Score < (
+                SELECT Score FROM Choose
+                WHERE ID = (SELECT ID FROM Student WHERE Name = '张三') AND CourseID = 'C1'
+            );
+            ```
+        *   **结果:** ![image-20250525131537747](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525131537747.png)
+    10. **任务10:** 用 SELECT 语句求选了 C2 课程并且也选了 C3 课程的学生的学号。
+        
+        *   **SQL 语句 (方法一: INTERSECT):**
+            ```sql
+            SELECT ID FROM Choose WHERE CourseID = 'C2'
+            INTERSECT
+            SELECT ID FROM Choose WHERE CourseID = 'C3';
+            ```
+        *   **SQL 语句 (方法二: GROUP BY and HAVING):**
+            ```sql
+            SELECT ID FROM Choose
+            WHERE CourseID IN ('C2', 'C3')
+            GROUP BY ID
+            HAVING COUNT(DISTINCT CourseID) = 2;
+            ```
+        *   **结果:** ![image-20250525131648157](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525131648157.png)
+    
+4.  **实验小结:**
+    本次实验深入学习了 SELECT 查询语句的多种用法，包括简单查询、连接查询（JOIN）、嵌套子查询以及集合操作（INTERSECT），能够根据复杂需求从多表中提取所需数据。
+
+---
+
+## **实验七: SQL 语言的 DCL**
+
+1.  **实验目的:**
+    *   了解 DCL 语言的 GRANT 和 REVOKE 语句对数据库存取权限的控制。
+    *   学会用 DCL 语言对数据库存取权限进行设定。
+
+3.  **实验任务与结果:**
+    
+    1.  **任务1:**建立一个新用户 DCL，用户名和口令都相同。
+        
+        *   **操作:** 在 Windows 操作系统中创建用户 DCL，密码设置为 DCL。
+        *   **结果:** Windows 用户 DCL 创建成功。
+            *   ![QQ20250521-204537](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-204537.png)![QQ20250521-204610](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-204610.png)
+        
+    2.  **任务2:** 用 GRANT 语句将 ALL PRIVILEGES 的系统特权授给用户 DCL。(注意: SQL Server 中没有直接的 `GRANT ALL PRIVILEGES` 给 Windows 用户，通常是创建登录名并授予服务器角色如 `sysadmin` 或数据库角色如 `db_owner`)
+        
+        *   **创建新连接**
+        *   **结果:** ![QQ20250521-204900](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-204900.png)
+        
+    3.  **任务3:** 注销用户 Administrator，用 DCL 登录系统，打开数据库 SQL Server 2000 的查询分析器，用 CREATE DATABASE 语句建立一个新的数据库 DCLDemo。
+        *   **操作:** 注销 Windows Administrator，以 Windows 用户 DCL 登录系统。打开查询分析器，使用 Windows 身份验证连接 SQL Server。
+        *   **SQL 语句:** `CREATE DATABASE DCLDemo;`
+        *   **结果:** 数据库 DCLDemo 创建成功。
+            *   ![image-20250525131833734](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525131833734.png)
+        
+    4.  **任务4:** 在数据库 DCLDemo 上建立一个表 Abc，表结构如下图所示:
+        | 字段名 | 类型    | 长度 | 含义  |
+        | :----- | :------ | :--- | :---- |
+        | A1     | Varchar | 20   | 字段1 |
+        | B2     | Dec     | 4,2  | 字段2 |
+        | C3     | Int     |      | 字段3 |
+        *   **SQL 语句 (在 DCLDemo 数据库下执行):**
+            ```sql
+            USE DCLDemo;
+            CREATE TABLE Abc (
+                A1 VARCHAR(20),
+                B2 DECIMAL(4,2),
+                C3 INT
+            );
+            ```
+        *   **结果:** 表 Abc 创建成功。
+            
+            *   ![image-20250525132138343](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525132138343.png)
+        
+    5.  **任务5:** 在表 Abc 中插入 1 条记录，如下图所示:
+        | A1       | B2   | C3   |
+        | :------- | :--- | :--- |
+        | DCL 测试 | 90.5 | 30   |
+        *   **SQL 语句:** `INSERT INTO Abc (A1, B2, C3) VALUES ('DCL 测试', 90.5, 30);`
+        *   **结果:** 记录插入成功。
+            *   ![image-20250525132222538](C:\Users\Lenovo\AppData\Roaming\Typora\typora-user-images\image-20250525132222538.png)
+        
+    6.  **任务6:** 注销用户 DCL，用 Administrator 登录系统，用 REVOKE 语句将用户 DCL 在表 Abc 中修改 A1 的权利收回。
+        
+        *   **操作:** 注销 Windows DCL 用户，以 Windows Administrator 登录系统。打开查询分析器，连接 SQL Server。
+        *   **SQL 语句:**
+            ```sql
+            USE DCLDemo;
+            -- 收回对 Abc 表 A1 列的 UPDATE 权限
+            REVOKE UPDATE ON Abc(A1) FROM DCL; -- 或 'YOUR_COMPUTER_NAME\DCL'
+            -- 或者收回整个表的 UPDATE 权限
+            -- REVOKE UPDATE ON Abc FROM DCL;
+            ```
+        *   **结果:** 权限回收成功。
+            *   ![QQ20250521-210438](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-210438.png)
+
+4.  **实验小结:**
+    本次实验学习了 DCL 语句的基本使用，包括创建用户登录名、授予服务器/数据库权限 (GRANT)，以及回收权限 (REVOKE)。理解了数据库安全管理中用户权限控制的重要性。
+
+---
+
+## **实验八: SQL 语言综合练习**
+
+1.  **实验目的:**
+    *   巩固 SQL 语言的掌握程度，综合运用 DDL, DML, DCL。
+    *   提升对数据库操作的熟练度。
+
+3.  **实验任务与结果:**
+    
+    1.  **任务1:** 建表 Exam，表结构如下图所示:
+        | 字段名  | 类型    | 长度 | 含义     |
+        | :------ | :------ | :--- | :------- |
+        | id      | varchar | 17   | 学生编号 |
+        | name    | varchar | 10   | 姓名     |
+        | sex     | varchar | 2    | 性别     |
+        | age     | integer |      | 年龄     |
+        | score   | numeric | 6,2  | 总成绩   |
+        | address | varchar | 50   | 地址     |
+        | memo    | varchar | 100  | 备注     |
+        *   **SQL 语句:**
+            ```sql
+            CREATE TABLE Exam (
+                id VARCHAR(17) PRIMARY KEY,
+                name VARCHAR(10),
+                sex VARCHAR(2),
+                age INTEGER,
+                score NUMERIC(6,2),
+                address VARCHAR(50),
+                memo VARCHAR(100)
+            );
+            ```
+        *   **结果:** ![QQ20250521-210939](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-210939.png)
+    2.  **任务2:** 用 Insert Into 语句向 Exam 表中添加 6 条记录:
+        | id    | name | sex  | age  | score  | address          | memo         |
+        | :---- | :--- | :--- | :--- | :----- | :--------------- | :----------- |
+        | A0001 | 赵一 | 男   | 20   | 580.00 | 重邮宿舍 12-3-5  | 学习委员     |
+        | B0002 | 钱二 | 女   | 19   | 540.00 | 南福苑 5-2-9     | 班长         |
+        | C0003 | 孙三 | 男   | 21   | 555.50 | 学生新区 21-5-15 | 优秀共青团员 |
+        | D0004 | 李四 | 男   | 22   | 480.00 | 重邮宿舍 8-2-22  | 暂无相关信息 |
+        | E0005 | 周五 | 女   | 20   | 495.50 | 学生新区 23-4-8  | 暂无相关信息 |
+        | F0006 | 吴六 | 男   | 19   | 435.00 | 南福苑 2-5-12    | 暂无相关信息 |
+        *   **SQL 语句:**
+            ```sql
+            INSERT INTO Exam (id, name, sex, age, score, address, memo) VALUES
+            ('A0001', '赵一', '男', 20, 580.00, '重邮宿舍 12-3-5', '学习委员'),
+            ('B0002', '钱二', '女', 19, 540.00, '南福苑 5-2-9', '班长'),
+            ('C0003', '孙三', '男', 21, 555.50, '学生新区 21-5-15', '优秀共青团员'),
+            ('D0004', '李四', '男', 22, 480.00, '重邮宿舍 8-2-22', '暂无相关信息'),
+            ('E0005', '周五', '女', 20, 495.50, '学生新区 23-4-8', '暂无相关信息'),
+            ('F0006', '吴六', '男', 19, 435.00, '南福苑 2-5-12', '暂无相关信息');
+            ```
+        *   **结果:** ![QQ20250521-211127](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-211127.png)
+    3.  **任务3:** 对表 Exam 的 Score 字段建立一个名为 IndexScore 的升序索引。
+        *   **SQL 语句:** `CREATE INDEX IndexScore ON Exam (score ASC);`
+        *   **结果:** ![QQ20250521-211207](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-211207.png)
+    4.  **任务4:** 建立视图 ViewExam，字段 ViewExam1 和 ViewExam2 分别对应表 Exam 的 Name 和 Address 字段。
+        *   **SQL 语句:**
+            ```sql
+            CREATE VIEW ViewExam (ViewExam1, ViewExam2)
+            AS
+            SELECT Name, Address FROM Exam;
+            ```
+        *   **结果:** ![QQ20250521-211322](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-211322.png)
+    5.  **任务5:** 在数据库中建立 jm、zjm、dhshow 等三个表，数据自行插入若干。
+        *   **Jm 表:** (局名编码, 局名汉字说明, 局名标志)
+            ```sql
+            CREATE TABLE Jm (
+                Jmbm VARCHAR(10) PRIMARY KEY, -- 局名编码
+                Jmhz VARCHAR(50),           -- 局名汉字说明
+                Jmbz VARCHAR(20)            -- 局名标志
+            );
+            -- 插入局名数据
+            INSERT INTO Jm (Jmbm, Jmhz, Jmbz) VALUES
+            ('LS', '拉萨局', '1'),
+            ('AL', '阿里局', '1'),
+            ('CD', '成都局', '0');
+            ```
+        *   **Zjm 表:** (子局名编码, 子局名汉字说明, 局名编码, 子局名标志)
+            ```sql
+            CREATE TABLE Zjm (
+                Zjmbm VARCHAR(10) PRIMARY KEY, -- 子局名编码
+                Zjmhz VARCHAR(50),           -- 子局名汉字说明
+                Jmbm VARCHAR(10) REFERENCES Jm(Jmbm), -- 局名编码
+                Zjmbz VARCHAR(20)            -- 子局名标志
+            );
+            -- 插入子局名数据
+            INSERT INTO Zjm (Zjmbm, Zjmhz, Jmbm, Zjmbz) VALUES
+            ('LS-01', '拉萨城关子局', 'LS', '1'),
+            ('LS-02', '拉萨堆龙子局', 'LS', '1'),
+            ('AL-01', '阿里普兰子局', 'AL', '1'),
+            ('AL-02', '阿里革吉子局', 'AL', '0');
+            -- ... 更多数据
+            ```
+        *   **Dhshow 表:** (电话号码, 长话费, 市话费, 地区编码, 子局名编码)
+            ```sql
+            CREATE TABLE Dhshow (
+                Dhh VARCHAR(20) PRIMARY KEY,  -- 电话号码
+                S11 INT,                     -- 长话费 (分)
+                S13 INT,                     -- 市话费 (分)
+                S139 VARCHAR(10),            -- 地区编码 (假设S139可用于关联Jm或Zjm)
+                S140 VARCHAR(10) REFERENCES Zjm(Zjmbm) -- 子局名编码
+            );
+            -- 插入电话费用数据
+            INSERT INTO Dhshow (Dhh, S11, S13, S139, S140) VALUES
+            ('08911234567', 2500, 800, '0891', 'LS-01'),  -- 拉萨长话25元，市话8元
+            ('08911234568', 1800, 1200, '0891', 'LS-02'), -- 拉萨长话18元，市话12元
+            ('08971234567', 3200, 1500, '0897', 'AL-01'), -- 阿里长话32元，市话15元
+            ('08971234568', 0, 800, '0897', 'AL-02'),     -- 阿里长话0元，市话8元
+            ('08971234569', 500, 1100, '0897', 'AL-01');  -- 阿里长话5元，市话11元
+            ```
+        *   **结果:**![QQ20250521-211926](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-211926.png)
+        *   ![QQ20250521-212008](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-212008.png)
+    6.  **任务6:** 用 SELECT 语句，求拉萨地区长话消费平均是多少分人民币。
+        *   **SQL 语句:**
+            ```sql
+            SELECT AVG(d.S11) AS AvgLongDistanceCost_Lhasa
+            FROM Dhshow d
+            JOIN Zjm z ON d.S140 = z.Zjmbm
+            JOIN Jm j ON z.Jmbm = j.Jmbm
+            WHERE j.Jmhz = '拉萨地区';
+            ```
+        *   **结果:** ![QQ20250521-212036](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-212036.png)
+    7.  **任务7:** 用 SELECT 语句，求阿里地区市话消费总大于 10 元人民币并且长话消费不为零的电话号码。
+        *   **SQL 语句:**
+            ```sql
+            SELECT d.Dhh
+            FROM Dhshow d
+            JOIN Zjm z ON d.S140 = z.Zjmbm
+            JOIN Jm j ON z.Jmbm = j.Jmbm
+            WHERE j.Jmhz = '%阿里%' AND d.S13 > 1000 AND d.S11 > 0; -- 10元 = 1000分
+            ```
+        *   **结果:** ![QQ20250521-212052](C:\Users\Lenovo\Desktop\新建文件夹(1)(1)\新建文件夹\QQ20250521-212052.png)
+    
+4.  **实验小结:**
+    本次综合练习全面复习了 SQL 语言的各项操作，包括表的创建、数据插入、索引和视图的建立，以及复杂的多表连接查询。通过实际操作，对 SQL 语言的运用更加熟练。
+
+---
+
+**实验总结与体会**
+
+通过本系列数据库实验，我系统地学习并实践了 SQL Server 2000 的安装、配置、数据库对象的创建与管理 (DDL)，数据的操作与维护 (DML)，以及数据库的安全控制 (DCL)。
+
+*   **主要收获:**
+    1.  掌握了 Navicat 的基本操作环境，包括服务管理器、企业管理器和查询分析器的使用。
+    2.  熟练运用 SQL 语言进行数据库定义（CREATE, ALTER, DROP），能够创建和修改表、视图、索引等对象。
+    3.  熟练运用 SQL 语言进行数据操纵（INSERT, UPDATE, DELETE, SELECT），能够实现数据的增删改查，特别是掌握了多表连接查询、子查询、聚合函数等高级查询技巧。
+    4.  初步了解了数据库权限管理的基本概念和 DCL 语句（GRANT, REVOKE）的使用。
+    5.  通过综合练习，将所学知识融会贯通，提升了解决实际数据库问题的能力。
+
+*   **遇到的问题与解决方法:**
+    *   [例如: 在进行用户权限设置时，对 Windows 用户和 Navicat 登录名的理解不够清晰，通过查阅资料和老师指导得以解决。]
+    *   [例如: 编写复杂查询语句时，逻辑容易混乱，通过分解问题、逐步构建查询语句的方式提高了正确率。]
+
+*   **实验体会:**
+    数据库是信息系统的核心，SQL 语言是操作数据库的强大工具。理论学习固然重要，但动手实践才能真正理解和掌握。本次实验过程虽然有时会遇到困难，但通过不断尝试和调试，最终完成任务的成就感非常强。实验不仅加深了对课本知识的理解，也培养了分析问题和解决问题的能力。希望未来能有更多机会接触和应用更高级的数据库技术。
+
+---
